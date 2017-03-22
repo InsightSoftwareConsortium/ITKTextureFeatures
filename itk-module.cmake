@@ -11,9 +11,11 @@ file(READ "${MY_CURRENT_DIR}/README.rst" DOCUMENTATION)
 # ITK.
 
 # define the dependencies of the include module and the tests
-itk_module(ITKTextureFeatures
+itk_module(TextureFeatures
   DEPENDS
     ITKCommon
+    ITKStatistics
+    ITKImageGrid
   COMPILE_DEPENDS
     ITKImageSources
   TEST_DEPENDS
@@ -22,5 +24,4 @@ itk_module(ITKTextureFeatures
   DESCRIPTION
     "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT
-  ENABLE_SHARED
 )
