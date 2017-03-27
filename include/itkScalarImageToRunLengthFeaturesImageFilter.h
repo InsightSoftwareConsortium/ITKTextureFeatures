@@ -19,10 +19,8 @@
 #define itkScalarImageToRunLengthFeaturesImageFilter_h
 
 #include "itkImageToImageFilter.h"
-////////////////////////////////////////////////////////////////
 #include "itkImageRegion.h"
 #include "itkConstNeighborhoodIterator.h"
-////////////////////////////////////////////////////////////////
 #include "itkHistogramToRunLengthFeaturesFilter.h"
 #include "itkScalarImageToRunLengthMatrixFilter.h"
 
@@ -72,15 +70,17 @@ public:
   typedef typename OffsetVector::Pointer                    OffsetVectorPointer;
   typedef typename OffsetVector::ConstPointer               OffsetVectorConstPointer;
 
-  ////////////////////////////////////////////////////////////////
   typedef typename InputImageType::RegionType   InputRegionType;
-  typedef typename InputRegionType::IndexType   RegionIndexType;
-  typedef typename InputRegionType::SizeType    RegionSizeType;
+  typedef typename InputRegionType::IndexType   InputRegionIndexType;
+  typedef typename InputRegionType::SizeType    InputRegionSizeType;
+
+  typedef typename OutputImageType::RegionType   OutputRegionType;
+  typedef typename OutputRegionType::IndexType   OutputRegionIndexType;
+  typedef typename OutputRegionType::SizeType    OutputRegionSizeType;
 
   typedef typename itk::ConstNeighborhoodIterator< InputImageType > NeighborhoodIteratorType;
-  typedef typename NeighborhoodIteratorType::RadiusType        NeighborhoodRadiusType;
+  typedef typename NeighborhoodIteratorType::RadiusType             NeighborhoodRadiusType;
 
-  ////////////////////////////////////////////////////////////////
 
   typedef ScalarImageToRunLengthMatrixFilter<InputImageType, FrequencyContainerType >
   RunLengthMatrixFilterType;
@@ -117,10 +117,8 @@ public:
   itkSetConstObjectMacro(Offsets, OffsetVector);
   itkGetConstObjectMacro(Offsets, OffsetVector);
 
-  ////////////////////////////////////////////////////////////////
-  itkSetConstObjectMacro(NeighborhoodRadius, NeighborhoodRadiusType);
-  itkGetConstObjectMacro(NeighborhoodRadius, NeighborhoodRadiusType);
-  ////////////////////////////////////////////////////////////////
+  itkSetMacro(NeighborhoodRadius, NeighborhoodRadiusType);
+  itkGetConstMacro(NeighborhoodRadius, NeighborhoodRadiusType);
 
   /** Set number of histogram bins along each axis.
       Optional; for default value see above. */
@@ -156,16 +154,12 @@ protected:
 
   /** This method causes the filter to generate its output. */
   virtual void GenerateData() ITK_OVERRIDE;
+  virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
   typename RunLengthMatrixFilterType::Pointer m_RunLengthMatrixGenerator;
 
-  ////////////////////////////////////////////////////////////////
-//  RegionIndexType               m_RegionInex;
-//  RegionSizeType                m_RegionSize;
   NeighborhoodRadiusType        m_NeighborhoodRadius;
-  ////////////////////////////////////////////////////////////////
-
   FeatureValueVectorPointer     m_FeatureMeans;
   FeatureValueVectorPointer     m_FeatureStandardDeviations;
   FeatureNameVectorConstPointer m_RequestedFeatures;
