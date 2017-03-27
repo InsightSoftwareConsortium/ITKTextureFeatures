@@ -32,7 +32,7 @@ int FilterCreationTest(int argc, char * argv[])
   // Parse command line argumentsa
   std::string inputFilename = argv[1];
   // Setup types
-  typedef itk::Image< long, 3 >             InputImageType;
+  typedef itk::Image< int, 3 >             InputImageType;
   typedef itk::Image< float, 3 >             OutputImageType;
   typedef itk::ImageFileReader< InputImageType >  readerType;
 
@@ -46,8 +46,6 @@ int FilterCreationTest(int argc, char * argv[])
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput(reader->GetOutput());
   filter->UpdateLargestPossibleRegion();
-
-  OutputImageType::Pointer out = OutputImageType::New();
 
   // Create and setup a writter
   typedef  itk::ImageFileWriter< OutputImageType  > WriterType;
