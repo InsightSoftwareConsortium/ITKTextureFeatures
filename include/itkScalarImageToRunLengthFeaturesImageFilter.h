@@ -102,7 +102,6 @@ public:
   using Superclass::SetInput;
   void SetInput(const InputImageType *);
 
-  const InputImageType * GetInput() const;
 
   /** Return the feature means and deviations.  */
   itkGetConstReferenceObjectMacro(FeatureMeans, FeatureValueVector);
@@ -132,15 +131,19 @@ public:
       feature calculations. Optional; for default value see above. */
   void SetDistanceValueMinMax( double min, double max );
 
-  /** Connects the mask image for which the histogram is going to be computed.
-      Optional; for default value see above. */
-  void SetMaskImage(const InputImageType *);
+  /** Method to set the mask image */
+  void SetMaskImage( const InputImageType *image );
 
+  /** Method to get the mask image */
   const InputImageType * GetMaskImage() const;
 
-  /** Set the pixel value of the mask that should be considered "inside" the
-      object. Optional; for default value see above. */
-  void SetInsidePixelValue(PixelType InsidePixelValue);
+  /**
+   * Set the pixel value of the mask that should be considered "inside" the
+   * object. Defaults to 1.
+   */
+  itkSetMacro( InsidePixelValue, PixelType );
+  itkGetConstMacro( InsidePixelValue, PixelType );
+
 
   itkGetConstMacro(FastCalculations, bool);
   itkSetMacro(FastCalculations, bool);
@@ -176,6 +179,9 @@ private:
   FeatureNameVectorConstPointer m_RequestedFeatures;
   OffsetVectorConstPointer      m_Offsets;
   bool                          m_FastCalculations;
+
+  PixelType                     m_InsidePixelValue;
+
 };
 } // end of namespace Statistics
 } // end of namespace itk
