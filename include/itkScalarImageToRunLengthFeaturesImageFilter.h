@@ -162,7 +162,9 @@ protected:
   virtual void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
 
   /** This method causes the filter to generate its output. */
-  virtual void GenerateData() ITK_OVERRIDE;
+  virtual void BeforeThreadedGenerateData() ITK_OVERRIDE;
+  virtual void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
+                                    ThreadIdType threadId) ITK_OVERRIDE;
   virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
