@@ -32,8 +32,13 @@ namespace Statistics
 {
 template< typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer >
 ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage, THistogramFrequencyContainer >
-::ScalarImageToRunLengthFeaturesImageFilter()
-{
+::ScalarImageToRunLengthFeaturesImageFilter() :
+    m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
+    m_Min( NumericTraits<PixelType>::NonpositiveMin() ),
+    m_Max( NumericTraits<PixelType>::max() ),
+    m_MinDistance( NumericTraits<RealType>::ZeroValue() ),
+    m_MaxDistance( NumericTraits<RealType>::max() ),
+    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() ){
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfRequiredOutputs( 1 );
 
@@ -86,7 +91,18 @@ ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage, THistogram
   this->m_FastCalculations = false;
   NeighborhoodType Nhood;
   Nhood.SetRadius( 2 );
+
+  const unsigned int measurementVectorSize = 2;
+
   this->m_NeighborhoodRadius = Nhood.GetRadius( );
+
+  this->m_LowerBound.SetSize( measurementVectorSize );
+  this->m_UpperBound.SetSize( measurementVectorSize );
+
+  this->m_LowerBound[0] = this->m_Min;
+  this->m_LowerBound[1] = this->m_MinDistance;
+  this->m_UpperBound[0] = this->m_Max;
+  this->m_UpperBound[1] = this->m_MaxDistance;
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
@@ -94,7 +110,6 @@ void
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
 ::GenerateOutputInformation()
 {
-
   typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
   typename Superclass::InputImageConstPointer inputPtr  = this->GetInput();
 
@@ -160,11 +175,11 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
 ::ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                        ThreadIdType threadId)
 {
-  TInputImage *inputPtr  = const_cast<TInputImage *>(this->GetInput());
-  inputPtr->DisconnectPipeline();
+
+  TInputImage       *inputPtr  = const_cast<TInputImage *>(this->GetInput());
   TOutputImage      *outputPtr = this->GetOutput();
-  TInputImage *temp1;
-  const itk::Statistics::Histogram<double,THistogramFrequencyContainer> *temp2;
+
+  inputPtr->DisconnectPipeline();
 
   InputRegionType inputRegionForThread;
   inputRegionForThread.SetSize( outputRegionForThread.GetSize() );
@@ -176,88 +191,104 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
                outputRegionForThread.GetIndex()[i];
     }
 
+
     inputRegionForThread.SetIndex(start);
+
+    typedef typename itk::RegionOfInterestImageFilter< InputImageType, InputImageType > ExtractionFilterType;
+    typename ExtractionFilterType::Pointer ExtractionFilter = ExtractionFilterType::New();
+    ExtractionFilter->SetInput( inputPtr );
 
   typedef itk::ImageRegionConstIteratorWithIndex< InputImageType > ConstIteratorType;
   ConstIteratorType inputIt(inputPtr, inputRegionForThread );
   typedef itk::ImageRegionIteratorWithIndex< OutputImageType> IteratorType;
   IteratorType outputIt( outputPtr, outputRegionForThread );
 
-
-
   typename RunLengthMatrixFilterType::Pointer runLengthMatrixGenerator = RunLengthMatrixFilterType::New();
-
   typename OffsetVector::ConstIterator offsetIt = this->m_Offsets->Begin();
   runLengthMatrixGenerator->SetOffset( offsetIt.Value() );
+  runLengthMatrixGenerator->SetDistanceValueMinMax(m_MinDistance, m_MaxDistance);
+  runLengthMatrixGenerator->SetNumberOfBinsPerAxis(m_NumberOfBinsPerAxis);
+  runLengthMatrixGenerator->SetPixelValueMinMax (m_Min, m_Max);
+  runLengthMatrixGenerator->SetInsidePixelValue (m_InsidePixelValue);
+
 
   typename RunLengthFeaturesFilterType::Pointer runLengthMatrixCalculator = RunLengthFeaturesFilterType::New();
-  typedef typename RunLengthFeaturesFilterType::RunLengthFeatureName InternalRunLengthFeatureName;
 
+  typedef typename RunLengthFeaturesFilterType::RunLengthFeatureName InternalRunLengthFeatureName;
   typename FeatureNameVector::ConstIterator fnameIt;
   fnameIt = this->m_RequestedFeatures->Begin();
   fnameIt++;fnameIt++;fnameIt++;
-
   while( !inputIt.IsAtEnd() )
     {
     typename InputImageType::IndexType inputIndex  = inputIt.GetIndex();
 
-    typename InputImageType::IndexType start;
-    typename InputImageType::IndexType end;
 
-    for(unsigned int i = 0; i < inputIndex.Dimension; i++)
+    if( ( this->GetMaskImage() && this->GetMaskImage()->GetPixel( inputIndex ) != this->m_InsidePixelValue ) )
       {
-      start[i] =  inputIndex[i] -  m_NeighborhoodRadius[i];
-      end[i] = inputIndex[i] + m_NeighborhoodRadius[i];
+      outputIt.Set( 0 );
       }
+    else
+      {
+      typename InputImageType::IndexType start;
+      typename InputImageType::IndexType end;
 
-    std::cout<<inputIndex<<std::endl;
+      for(unsigned int i = 0; i < inputIndex.Dimension; i++)
+        {
+        start[i] =  inputIndex[i] -  m_NeighborhoodRadius[i];
+        end[i] = inputIndex[i] + m_NeighborhoodRadius[i];
+        }
+
+      typename InputImageType::RegionType ExtractedRegion;
+      ExtractedRegion.SetIndex( start );
+      ExtractedRegion.SetUpperIndex( end );
+
+      inputPtr->SetRequestedRegion( ExtractedRegion );
+      ExtractionFilter->SetRegionOfInterest( ExtractedRegion );
 
 
-    typename InputImageType::RegionType ExtractedRegion;
-    ExtractedRegion.SetIndex( start );
-    ExtractedRegion.SetUpperIndex( end );
+      runLengthMatrixGenerator->SetInput( ExtractionFilter->GetOutput() );
 
-    typedef typename itk::RegionOfInterestImageFilter< InputImageType, InputImageType > ExtractionFilterType;
-    typename ExtractionFilterType::Pointer ExtractionFilter = ExtractionFilterType::New();
-    ExtractionFilter->SetInput( inputPtr );
+      runLengthMatrixCalculator->SetInput( runLengthMatrixGenerator->GetOutput() );
+      runLengthMatrixCalculator->UpdateLargestPossibleRegion();
 
-    ExtractionFilter->SetRegionOfInterest( ExtractedRegion );
-    ExtractionFilter->UpdateLargestPossibleRegion();
-    temp1 = ExtractionFilter->GetOutput();
 
-    runLengthMatrixGenerator->SetInput( temp1 );
-    runLengthMatrixGenerator->UpdateLargestPossibleRegion();
-    temp2 = runLengthMatrixGenerator->GetOutput();
+      outputIt.Set( runLengthMatrixCalculator->GetFeature(( InternalRunLengthFeatureName )fnameIt.Value())  );
 
-    runLengthMatrixCalculator->SetInput( temp2 );
-    runLengthMatrixCalculator->UpdateLargestPossibleRegion();
-
-    outputIt.Set( runLengthMatrixCalculator->GetFeature(( InternalRunLengthFeatureName )fnameIt.Value())  );
+      outputPtr->SetRequestedRegionToLargestPossibleRegion();
+      }
     ++inputIt;
     ++outputIt;
+
     }
+
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
 void
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::SetInput( const InputImageType *image )
+::AfterThreadedGenerateData()
+{
+}
+
+template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
+void
+ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
+::SetMaskImage(const InputImageType *image )
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput( 0,
-    const_cast<InputImageType *>( image ) );
-
-  this->m_RunLengthMatrixGenerator->SetInput( image );
+  this->ProcessObject::SetNthInput( 1, const_cast<InputImageType *>( image ) );
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
-void
+const TInputImage *
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::SetNumberOfBinsPerAxis( unsigned int numberOfBins )
+::GetMaskImage() const
 {
-  itkDebugMacro( "setting NumberOfBinsPerAxis to " << numberOfBins );
-  this->m_RunLengthMatrixGenerator->SetNumberOfBinsPerAxis( numberOfBins );
-  this->Modified();
+  if( this->GetNumberOfInputs() < 2 )
+    {
+    return ITK_NULLPTR;
+    }
+  return static_cast<const InputImageType *>( this->ProcessObject::GetInput( 1 ) );
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
@@ -265,66 +296,28 @@ void
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
 ::SetPixelValueMinMax( PixelType min, PixelType max )
 {
-  itkDebugMacro( "setting Min to " << min << "and Max to " << max );
-  this->m_RunLengthMatrixGenerator->SetPixelValueMinMax( min, max );
-  this->Modified();
-}
-
-template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
-void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::SetDistanceValueMinMax( double min, double max )
-{
-  itkDebugMacro( "setting Min to " << min << "and Max to " << max );
-  this->m_RunLengthMatrixGenerator->SetDistanceValueMinMax( min, max );
-  this->Modified();
-}
-
-template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
-void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::SetMaskImage( const InputImageType *image )
-{
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput( 1,
-    const_cast< InputImageType * >( image ) );
-
-  this->m_RunLengthMatrixGenerator->SetMaskImage( image );
-}
-
-template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
-const TInputImage *
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::GetInput() const
-{
-  if ( this->GetNumberOfInputs() < 1 )
+  if( this->m_Min != min || this->m_Max != max )
     {
-    return ITK_NULLPTR;
+    itkDebugMacro( "setting Min to " << min << "and Max to " << max );
+    this->m_Min = min;
+    this->m_Max = max;
+    this->Modified();
     }
-  return static_cast<const InputImageType *>( this->ProcessObject::GetInput( 0 ) );
-}
-
-
-template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
-const TInputImage *
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::GetMaskImage() const
-{
-  if ( this->GetNumberOfInputs() < 2 )
-    {
-    return ITK_NULLPTR;
-    }
-  return static_cast< const InputImageType *>( this->ProcessObject::GetInput( 1 ) );
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
 void
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::SetInsidePixelValue( PixelType insidePixelValue )
+::SetDistanceValueMinMax( RealType min, RealType max )
 {
-  itkDebugMacro( "setting InsidePixelValue to " << insidePixelValue );
-  this->m_RunLengthMatrixGenerator->SetInsidePixelValue( insidePixelValue );
-  this->Modified();
+  if( Math::NotExactlyEquals(this->m_MinDistance, min) || Math::NotExactlyEquals(this->m_MaxDistance, max) )
+    {
+    itkDebugMacro( "setting MinDistance to " << min << "and MaxDistance to "
+      << max );
+    this->m_MinDistance = min;
+    this->m_MaxDistance = max;
+    this->Modified();
+    }
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>

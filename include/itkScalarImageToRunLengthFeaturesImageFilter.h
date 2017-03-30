@@ -23,6 +23,9 @@
 #include "itkConstNeighborhoodIterator.h"
 #include "itkHistogramToRunLengthFeaturesFilter.h"
 #include "itkScalarImageToRunLengthMatrixFilter.h"
+#include "itkNumericTraits.h"
+#include "itkHistogram.h"
+
 
 namespace itk
 {
@@ -81,11 +84,15 @@ public:
   typedef typename itk::ConstNeighborhoodIterator< InputImageType > NeighborhoodIteratorType;
   typedef typename NeighborhoodIteratorType::RadiusType             NeighborhoodRadiusType;
 
+  typedef typename NumericTraits<PixelType>::RealType     MeasurementType;
+  typedef typename NumericTraits<PixelType>::RealType     RealType;
+  typedef Histogram<MeasurementType, THistogramFrequencyContainer> HistogramType;
+  typedef typename HistogramType::MeasurementVectorType   MeasurementVectorType;
+
+
 
   typedef ScalarImageToRunLengthMatrixFilter<InputImageType, FrequencyContainerType >
   RunLengthMatrixFilterType;
-  typedef typename RunLengthMatrixFilterType::HistogramType
-  HistogramType;
   typedef HistogramToRunLengthFeaturesFilter< HistogramType >
   RunLengthFeaturesFilterType;
 
@@ -97,12 +104,6 @@ public:
   typedef VectorContainer< unsigned char, double > FeatureValueVector;
   typedef typename FeatureValueVector::Pointer     FeatureValueVectorPointer;
 
-  /** Connects the input image for which the features are going to be computed
-    */
-  using Superclass::SetInput;
-  void SetInput(const InputImageType *);
-
-
   /** Return the feature means and deviations.  */
   itkGetConstReferenceObjectMacro(FeatureMeans, FeatureValueVector);
   itkGetConstReferenceObjectMacro(FeatureStandardDeviations, FeatureValueVector);
@@ -111,31 +112,78 @@ public:
   itkSetConstObjectMacro(RequestedFeatures, FeatureNameVector);
   itkGetConstObjectMacro(RequestedFeatures, FeatureNameVector);
 
-  /** Set the  offsets over which the co-occurrence pairs will be computed.
-      Optional; for default value see above. */
-  itkSetConstObjectMacro(Offsets, OffsetVector);
-  itkGetConstObjectMacro(Offsets, OffsetVector);
-
   itkSetMacro(NeighborhoodRadius, NeighborhoodRadiusType);
   itkGetConstMacro(NeighborhoodRadius, NeighborhoodRadiusType);
-
-  /** Set number of histogram bins along each axis.
-      Optional; for default value see above. */
-  void SetNumberOfBinsPerAxis(unsigned int);
-
-  /** Set the min and max (inclusive) pixel value that will be used for
-      feature calculations. Optional; for default value see above. */
-  void SetPixelValueMinMax(PixelType min, PixelType max);
-
-  /** Set the min and max (inclusive) pixel value that will be used for
-      feature calculations. Optional; for default value see above. */
-  void SetDistanceValueMinMax( double min, double max );
 
   /** Method to set the mask image */
   void SetMaskImage( const InputImageType *image );
 
   /** Method to get the mask image */
   const InputImageType * GetMaskImage() const;
+
+  /** Specify the default number of bins per axis */
+  itkStaticConstMacro( DefaultBinsPerAxis, unsigned int, 256 );
+
+  /**
+   * Set the offsets over which the intensity/distance pairs will be computed.
+   * Invoking this function clears the previous offsets.
+   * Note: for each individual offset in the OffsetVector, the rightmost non-zero
+   * offset element must be positive. For example, in the offset list of a 2D image,
+   * (1, 0) means the offset  along x-axis. (1, 0) has to be set instead
+   * of (-1, 0). This is required from the iterating order of pixel iterator.
+   *
+   */
+  itkSetObjectMacro( Offsets, OffsetVector );
+
+  /**
+   * Set offset over which the intensity/distance pairs will be computed.
+   * Invoking this function clears the previous offset(s).
+   * Note: for each individual offset, the rightmost non-zero
+   * offset element must be positive. For example, in the offset list of a 2D image,
+   * (1, 0) means the offset  along x-axis. (1, 0) has to be set instead
+   * of (-1, 0). This is required from the iterating order of pixel iterator.
+   *
+   */
+  void SetOffset( const OffsetType offset );
+
+  /**
+   * Get the current offset(s).
+   */
+  itkGetModifiableObjectMacro(Offsets, OffsetVector );
+
+  /** Set number of histogram bins along each axis */
+  itkSetMacro( NumberOfBinsPerAxis, unsigned int );
+
+  /** Get number of histogram bins along each axis */
+  itkGetConstMacro( NumberOfBinsPerAxis, unsigned int );
+
+  /**
+   * Set the min and max (inclusive) pixel value that will be used in
+   * generating the histogram.
+   */
+  void SetPixelValueMinMax( PixelType min, PixelType max );
+
+  /** Get the min pixel value defining one dimension of the joint histogram. */
+  itkGetConstMacro( Min, PixelType );
+
+  /** Get the max pixel value defining one dimension of the joint histogram. */
+  itkGetConstMacro( Max, PixelType );
+
+  /**
+   * Set the min and max (inclusive) pixel value that will be used in
+   * generating the histogram.
+   */
+  void SetDistanceValueMinMax( RealType min, RealType max );
+
+  /**
+   * Get the min distance value defining one dimension of the joint histogram.
+   */
+  itkGetConstMacro( MinDistance, RealType );
+
+  /**
+   * Get the max distance value defining one dimension of the joint histogram.
+   */
+  itkGetConstMacro( MaxDistance, RealType );
 
   /**
    * Set the pixel value of the mask that should be considered "inside" the
@@ -166,6 +214,8 @@ protected:
 
   /** This method causes the filter to generate its output. */
   virtual void BeforeThreadedGenerateData() ITK_OVERRIDE;
+  virtual void AfterThreadedGenerateData() ITK_OVERRIDE;
+
   virtual void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                                     ThreadIdType threadId) ITK_OVERRIDE;
   virtual void GenerateOutputInformation() ITK_OVERRIDE;
@@ -177,11 +227,18 @@ private:
   FeatureValueVectorPointer     m_FeatureMeans;
   FeatureValueVectorPointer     m_FeatureStandardDeviations;
   FeatureNameVectorConstPointer m_RequestedFeatures;
-  OffsetVectorConstPointer      m_Offsets;
+  OffsetVectorPointer           m_Offsets;
   bool                          m_FastCalculations;
 
-  PixelType                     m_InsidePixelValue;
+  unsigned int             m_NumberOfBinsPerAxis;
+  PixelType                m_Min;
+  PixelType                m_Max;
+  RealType                 m_MinDistance;
+  RealType                 m_MaxDistance;
+  PixelType                m_InsidePixelValue;
 
+  MeasurementVectorType    m_LowerBound;
+  MeasurementVectorType    m_UpperBound;
 };
 } // end of namespace Statistics
 } // end of namespace itk
