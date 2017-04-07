@@ -187,7 +187,7 @@ public:
   itkConceptMacro( InputPixelTypeCheck,
                    ( Concept::IsInteger< typename InputImageType::PixelType>) );
   itkConceptMacro( OutputPixelTypeCheck,
-                   ( Concept::IsFloatingPoint< typename OutputImageType::PixelType> ) );
+                   ( Concept::IsFloatingPoint< typename OutputImageType::PixelType::ValueType> ) );
   // End concept checking
 #endif
 
