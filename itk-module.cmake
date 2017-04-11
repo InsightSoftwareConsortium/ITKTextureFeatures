@@ -21,6 +21,7 @@ itk_module(TextureFeatures
   TEST_DEPENDS
     ITKTestKernel
     ITKMetaIO
+    ITKImageIntensity
   DESCRIPTION
     "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT
