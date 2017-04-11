@@ -1,4 +1,4 @@
-﻿/*=========================================================================
+/*=========================================================================
  *
  *  Copyright Insight Software Consortium
  *
@@ -23,9 +23,7 @@
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkMath.h"
 #include "itkRegionOfInterestImageFilter.h"
-#include "itkImageFileWriter.h"
 #include "itkNeighborhoodAlgorithm.h"
-#include <stdio.h>
 
 namespace itk
 {
@@ -85,13 +83,12 @@ ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage, THistogram
     offsets->push_back( offset );
     }
   this->SetOffsets( offsets );
-  this->m_FastCalculations = false;
-  NeighborhoodType Nhood;
-  Nhood.SetRadius( 2 );
+  NeighborhoodType nhood;
+  nhood.SetRadius( 2 );
 
   const unsigned int measurementVectorSize = 2;
 
-  this->m_NeighborhoodRadius = Nhood.GetRadius( );
+  this->m_NeighborhoodRadius = nhood.GetRadius( );
 
   this->m_LowerBound.SetSize( measurementVectorSize );
   this->m_UpperBound.SetSize( measurementVectorSize );
@@ -139,7 +136,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
   typename FeatureNameVector::ConstIterator fnameIt;
   typename TOutputImage::PixelType outputPixel;
 
-  // Creation of a region with the sqme size than the neighborhood that
+  // Creation of a region with the same size than the neighborhood, this region
   // will be used to check if each voxel has already been visited
   InputRegionType      boolRegion;
   typename InputRegionType::IndexType boolStart;
@@ -159,7 +156,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
   alreadyVisitedImage->SetRegions( boolRegion );
   alreadyVisitedImage->Allocate();
 
-  // Creation of the histogram that will be fill and used to compute the features
+  // Creation of the histogram that will be filled and used to compute the features
   const unsigned int measurementVectorSize = 2;
   typename HistogramType::IndexType hIndex;
   typename HistogramType::Pointer hist = HistogramType::New();
@@ -169,9 +166,9 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
   MeasurementVectorType run( hist->GetMeasurementVectorSize() );
   hist->Initialize( size, this->m_LowerBound, this->m_UpperBound );
   // Separation of the non-boundery region that will be processed in a different way
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > BoundaryFacesCalculator;
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = BoundaryFacesCalculator( inputPtr, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( inputPtr, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   /// ***** Non-boundary Region *****
@@ -211,7 +208,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
         alreadyVisitedImage->FillBuffer( false );
         OffsetType offset = offsets.Value();
         this->NormalizeOffsetDirection(offset);
-        // Iteration over the all neighborhood
+        // Iteration over the all neighborhood region
         for(NeighborIndexType nb = 0; nb<inputNIt.Size(); ++nb)
           {
           IndexType curentInNeighborhoodIndex = inputNIt.GetIndex(nb);
@@ -254,7 +251,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
               runLengthSegmentAlreadyVisited = true;
               break;
               }
-           pixelIntensity = inputNIt.GetPixel(iteratedOffset);
+            pixelIntensity = inputNIt.GetPixel(iteratedOffset);
             // Special attention paid to boundaries of bins.
             // For the last bin, it is left close and right close (following the previous
             // gerrit patch). For all other bins, the bin is left close and right open.
@@ -276,7 +273,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
             {
             continue;
             }
-          // Increase the good bin in the histogram
+          // Increase the coresponding bin in the histogram
           this->IncreaseHistograme(hist, inputPtr, run,
                                    hIndex,  curentInNeighborhoodPixelIntensity,
                                    curentInNeighborhoodIndex, lastGoodIndex);
@@ -416,8 +413,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
   Superclass::PrintSelf(os, indent);
   os << indent << "RequestedFeatures: "
      << this->GetRequestedFeatures() << std::endl;
-  os << indent << "FastCalculations: "
-     << this->GetFastCalculations() << std::endl;
   os << indent << "Offsets: " << this->GetOffsets() << std::endl;
 }
 } // end of namespace Statistics
