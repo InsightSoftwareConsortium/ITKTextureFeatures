@@ -114,6 +114,35 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
     this->m_LowerBound[1] = this->m_MinDistance;
     this->m_UpperBound[0] = this->m_Max;
     this->m_UpperBound[1] = this->m_MaxDistance;
+
+    typename HistogramType::Pointer hist = HistogramType::New();
+    hist->SetMeasurementVectorSize( 2 );
+    typename HistogramType::SizeType size( 2 );
+    size.Fill( this->m_NumberOfBinsPerAxis );
+    hist->Initialize( size, this->m_LowerBound, this->m_UpperBound );
+
+    this->m_digitalisedInputImage = InputImageType::New();
+    this->m_digitalisedInputImage->SetRegions(this->GetInput()->GetRequestedRegion());
+    this->m_digitalisedInputImage->CopyInformation(this->GetInput());
+    this->m_digitalisedInputImage->Allocate();
+    typedef itk::ImageRegionIterator< InputImageType> IteratorType;
+    IteratorType digitIt( this->m_digitalisedInputImage, this->m_digitalisedInputImage->GetLargestPossibleRegion() );
+    typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
+    ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
+    while( !inputIt.IsAtEnd() )
+      {
+      if(inputIt.Get() < this->m_Min ||
+         inputIt.Get() > this->m_Max)
+        {
+        digitIt.Set(inputIt.Get());
+        }
+      else
+        {
+        digitIt.Set(hist->GetBinMinFromValue( 0, inputIt.Get()));
+        }
+      ++inputIt;
+      ++digitIt;
+      }
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
@@ -123,8 +152,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
                        ThreadIdType threadId)
 {
   // Recuperation of the different inputs/outputs
-  typename TInputImage::Pointer inputPtr = TInputImage::New();
-  inputPtr  = const_cast<TInputImage *>(this->GetInput());
   typename TInputImage::Pointer maskPointer = TInputImage::New();
   maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
   typename TOutputImage::Pointer outputPtr = TOutputImage::New();
@@ -152,7 +179,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
     }
   boolRegion.SetIndex(boolStart);
   boolRegion.SetSize(boolSize);
-  alreadyVisitedImage->CopyInformation( inputPtr );
+  alreadyVisitedImage->CopyInformation( this->m_digitalisedInputImage );
   alreadyVisitedImage->SetRegions( boolRegion );
   alreadyVisitedImage->Allocate();
 
@@ -168,13 +195,13 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
   // Separation of the non-boundery region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( inputPtr, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_digitalisedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   /// ***** Non-boundary Region *****
   for ( fit; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, inputPtr, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_digitalisedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -192,7 +219,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
           }
         }
       // If the voxel is outside of the mask, don't treat it
-      if( ( maskPointer && maskPointer->GetPixel( inputNIt.GetIndex()  ) != this->m_InsidePixelValue ) )
+      if( ( maskPointer && maskPointer->GetPixel( inputNIt.GetIndex() ) != this->m_InsidePixelValue ) )
         {
         ++inputNIt;
         ++outputIt;
@@ -222,9 +249,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
             continue;
             }
           // Declaration and initialisation of the variables usefull to iterate over the run
-          MeasurementType curentInNeighborhoodBinMin = hist->GetBinMinFromValue( 0, curentInNeighborhoodPixelIntensity );
-          MeasurementType curentInNeighborhoodBinMax = hist->GetBinMaxFromValue( 0, curentInNeighborhoodPixelIntensity );
-          MeasurementType lastBinMax  =  hist->GetDimensionMaxs( 0 )[ hist->GetSize( 0 )-1 ];
           PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
           OffsetType iteratedOffset = inputNIt.GetOffset(nb) + offset;
           IndexType lastGoodIndex = curentInNeighborhoodIndex;
@@ -255,9 +279,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
             // Special attention paid to boundaries of bins.
             // For the last bin, it is left close and right close (following the previous
             // gerrit patch). For all other bins, the bin is left close and right open.
-            if ( pixelIntensity >= curentInNeighborhoodBinMin
-                && ( pixelIntensity < curentInNeighborhoodBinMax ||
-                     ( Math::ExactlyEquals(pixelIntensity, curentInNeighborhoodBinMax) && Math::ExactlyEquals(curentInNeighborhoodBinMax, lastBinMax) ) ) )
+            if ( pixelIntensity == curentInNeighborhoodPixelIntensity )
               {
                 alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
                 lastGoodIndex = inputNIt.GetIndex(iteratedOffset);
@@ -274,7 +296,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
             continue;
             }
           // Increase the coresponding bin in the histogram
-          this->IncreaseHistograme(hist, inputPtr, run,
+          this->IncreaseHistograme(hist, this->m_digitalisedInputImage, run,
                                    hIndex,  curentInNeighborhoodPixelIntensity,
                                    curentInNeighborhoodIndex, lastGoodIndex);
           }
