@@ -191,10 +191,10 @@ protected:
   virtual ~ScalarImageToRunLengthFeaturesImageFilter() {}
 
   void NormalizeOffsetDirection(OffsetType &offset);
-  bool IsInsideNeighborhood(OffsetType iteratedOffset);
-  void IncreaseHistograme(typename HistogramType::Pointer &hist, typename TInputImage::Pointer inputPtr, MeasurementVectorType run,
-                            typename HistogramType::IndexType &hIndex, const PixelType curentInNeighborhoodPixelIntensity,
-                            IndexType curentInNeighborhoodIndex, IndexType lastGoodIndex);
+  bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
+  void IncreaseHistograme(typename HistogramType::Pointer &hist, const typename TInputImage::Pointer &inputPtr, MeasurementVectorType &run,
+                          typename HistogramType::IndexType &hIndex, const PixelType &curentInNeighborhoodPixelIntensity,
+                          const OffsetType &offset, const unsigned int &pixelDistance);
   virtual void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
 
   /** This method causes the filter to generate its output. */
@@ -204,18 +204,19 @@ protected:
 //  virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
-  typename InputImageType::Pointer m_digitalisedInputImage;
-  NeighborhoodRadiusType           m_NeighborhoodRadius;
-  FeatureNameVectorConstPointer    m_RequestedFeatures;
-  OffsetVectorPointer              m_Offsets;
-  unsigned int                     m_NumberOfBinsPerAxis;
-  PixelType                        m_Min;
-  PixelType                        m_Max;
-  RealType                         m_MinDistance;
-  RealType                         m_MaxDistance;
-  PixelType                        m_InsidePixelValue;
-  MeasurementVectorType            m_LowerBound;
-  MeasurementVectorType            m_UpperBound;
+  typename InputImageType::Pointer  m_digitalisedInputImage;
+  NeighborhoodRadiusType            m_NeighborhoodRadius;
+  FeatureNameVectorConstPointer     m_RequestedFeatures;
+  OffsetVectorPointer               m_Offsets;
+  unsigned int                      m_NumberOfBinsPerAxis;
+  PixelType                         m_Min;
+  PixelType                         m_Max;
+  RealType                          m_MinDistance;
+  RealType                          m_MaxDistance;
+  PixelType                         m_InsidePixelValue;
+  MeasurementVectorType             m_LowerBound;
+  MeasurementVectorType             m_UpperBound;
+  typename TInputImage::SpacingType m_spacing;
 };
 } // end of namespace Statistics
 } // end of namespace itk

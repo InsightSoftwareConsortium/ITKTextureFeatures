@@ -143,6 +143,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
       ++inputIt;
       ++digitIt;
       }
+      m_spacing = this->GetInput()->GetSpacing();
 }
 
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
@@ -251,7 +252,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
           // Declaration and initialisation of the variables usefull to iterate over the run
           PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
           OffsetType iteratedOffset = inputNIt.GetOffset(nb) + offset;
-          IndexType lastGoodIndex = curentInNeighborhoodIndex;
+          unsigned int pixelDistance = 0;
           bool runLengthSegmentAlreadyVisited = false;
           bool insideNeighborhood = this->IsInsideNeighborhood(iteratedOffset);
           // Scan from the iterated pixel at index, following the direction of
@@ -282,7 +283,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
             if ( pixelIntensity == curentInNeighborhoodPixelIntensity )
               {
                 alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
-                lastGoodIndex = inputNIt.GetIndex(iteratedOffset);
+                pixelDistance++;
                 iteratedOffset += offset;
                 insideNeighborhood = this->IsInsideNeighborhood(iteratedOffset);
               }
@@ -297,8 +298,8 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
             }
           // Increase the coresponding bin in the histogram
           this->IncreaseHistograme(hist, this->m_digitalisedInputImage, run,
-                                   hIndex,  curentInNeighborhoodPixelIntensity,
-                                   curentInNeighborhoodIndex, lastGoodIndex);
+                                   hIndex, curentInNeighborhoodPixelIntensity,
+                                   offset, pixelDistance);
           }
         }
       // Compute the run lenght features
@@ -391,7 +392,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
 bool
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::IsInsideNeighborhood(OffsetType iteratedOffset)
+::IsInsideNeighborhood(const OffsetType &iteratedOffset)
 {
   bool insideNeighborhood = true;
   for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; ++i )
@@ -409,17 +410,19 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramF
 template<typename TInputImage, typename TOutputImage, typename THistogramFrequencyContainer>
 void
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage, THistogramFrequencyContainer>
-::IncreaseHistograme(typename HistogramType::Pointer &hist, typename TInputImage::Pointer inputPtr, MeasurementVectorType run,
-                     typename HistogramType::IndexType &hIndex, const PixelType curentInNeighborhoodPixelIntensity,
-                     IndexType curentInNeighborhoodIndex, IndexType lastGoodIndex)
+::IncreaseHistograme(typename HistogramType::Pointer &hist, const typename TInputImage::Pointer &inputPtr, MeasurementVectorType &run,
+                     typename HistogramType::IndexType &hIndex, const PixelType &curentInNeighborhoodPixelIntensity,
+                     const OffsetType &offset, const unsigned int &pixelDistance)
 {
-  PointType curentInNeighborhoodPoint;
-  inputPtr->TransformIndexToPhysicalPoint(curentInNeighborhoodIndex, curentInNeighborhoodPoint );
-  PointType point;
-  inputPtr->TransformIndexToPhysicalPoint( lastGoodIndex, point );
+  float offsetDistance = 0;
+  for( unsigned int i = 0; i < offset.GetOffsetDimension(); ++i)
+    {
+    offsetDistance += std::pow(offset[i]*m_spacing[i],2);
+    }
+  offsetDistance = std::pow(offsetDistance, 1.0/offset.GetOffsetDimension());
 
   run[0] = curentInNeighborhoodPixelIntensity;
-  run[1] = curentInNeighborhoodPoint.EuclideanDistanceTo( point );
+  run[1] = offsetDistance * pixelDistance;
   if( run[1] >= this->m_MinDistance && run[1] <= this->m_MaxDistance )
     {
     hist->GetIndex( run, hIndex );
