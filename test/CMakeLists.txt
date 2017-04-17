@@ -27,7 +27,7 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask1
   ${TEMP}/resultTestWithoutMask1.nrrd
   10
   0 4200
-  0 0.4
+  0 0.7
   2)
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask2
@@ -38,8 +38,8 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask2
   DATA{${INPUTDATA}/Scan_CBCT_13R_D1_crop.nrrd}
   ${TEMP}/resultTestWithoutMask2.nrrd
   10
-  1000 4200
-  0 0.4
+  0 4200
+  0 1.25
   4)
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask3
@@ -51,7 +51,7 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask3
   ${TEMP}/resultTestWithoutMask3.nrrd
   10
   0 4200
-  0 1
+  0 1.8
   6)
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterPartialImage1
@@ -64,7 +64,7 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterPartialImage1
   ${TEMP}/resultPartialImage1.nrrd
   10
   0 4200
-  0 0.4
+  0 0.7
   2)
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterPartialImage2
@@ -76,8 +76,8 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterPartialImage2
   DATA{${INPUTDATA}/SegmC_CBCT_13R_D1_crop.nrrd}
   ${TEMP}/resultPartialImage2.nrrd
   10
-  1000 4200
-  0 0.4
+  0 4200
+  0 1.25
   4)
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWholeImage
@@ -90,7 +90,7 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWholeImage
   ${TEMP}/resultWholeImage.nrrd
   10
   0 4200
-  0 0.4
+  0 0.7
   2)
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures
@@ -121,6 +121,6 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures
   ${TEMP}/resultSeparateFeatures
   10
   0 4200
-  0 0.4
+  0 0.7
   2)
 
