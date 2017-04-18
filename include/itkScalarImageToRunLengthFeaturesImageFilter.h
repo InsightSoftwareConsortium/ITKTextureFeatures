@@ -20,6 +20,9 @@
 
 #include "itkImageToImageFilter.h"
 #include "itkScalarImageToRunLengthMatrixFilter.h"
+#include "itkStructHashFunction.h"
+#include "itksys/hash_set.hxx"
+
 
 namespace itk
 {
@@ -247,6 +250,9 @@ protected:
 //  virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
+typedef typename itksys::hash_set< IndexType,
+                                    StructHashFunction< IndexType > > SetType;
+
   typename InputImageType::Pointer  m_DigitalisedInputImageg;
   NeighborhoodRadiusType            m_NeighborhoodRadius;
   OffsetVectorPointer               m_Offsets;

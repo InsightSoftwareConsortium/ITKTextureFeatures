@@ -154,7 +154,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
   typename InputRegionType::SizeType  boolSize;
   IndexType            boolCurentInNeighborhoodIndex;
   typedef Image<bool, TInputImage::ImageDimension> BoolImageType;
-  typename BoolImageType::Pointer alreadyVisitedImage = BoolImageType::New();
   for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; i++ )
     {
     boolSize[i] = this->m_NeighborhoodRadius[i]*2 + 1;
@@ -163,9 +162,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
     }
   boolRegion.SetIndex(boolStart);
   boolRegion.SetSize(boolSize);
-  alreadyVisitedImage->CopyInformation( this->m_DigitalisedInputImageg );
-  alreadyVisitedImage->SetRegions( boolRegion );
-  alreadyVisitedImage->Allocate();
 
   // Separation of the non-boundery region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
@@ -228,7 +224,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
       // Iteration over all the offsets
       for( offsets = m_Offsets->Begin(); offsets != m_Offsets->End(); ++offsets )
         {
-        alreadyVisitedImage->FillBuffer( false );
+        SetType set;
         offset = offsets.Value();
         this->NormalizeOffsetDirection(offset);
         // Iteration over the all neighborhood region
@@ -238,7 +234,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
           tempOffset = inputNIt.GetOffset(nb);
           // Cecking if the value is out-of-bounds or is outside the mask.
           if( curentInNeighborhoodPixelIntensity < this->m_Min || //the pixel is outside of the mask or outside of bounds
-            alreadyVisitedImage->GetPixel( boolCurentInNeighborhoodIndex + tempOffset) )
+            (set.find(boolCurentInNeighborhoodIndex + tempOffset) != set.end()) )
             {
             continue;
             }
@@ -262,7 +258,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
                 }
               }
             // For the same offset, each run length segment can only be visited once
-            if (alreadyVisitedImage->GetPixel(boolCurentInNeighborhoodIndex + iteratedOffset) )
+            if (set.find(boolCurentInNeighborhoodIndex + iteratedOffset) != set.end())
               {
               runLengthSegmentAlreadyVisited = true;
               break;
@@ -273,7 +269,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
             // gerrit patch). For all other bins, the bin is left close and right open.
             if ( pixelIntensity == curentInNeighborhoodPixelIntensity )
               {
-                alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
+                set.insert(boolCurentInNeighborhoodIndex + iteratedOffset);
                 pixelDistance++;
                 iteratedOffset += offset;
                 insideNeighborhood = this->IsInsideNeighborhood(iteratedOffset);
