@@ -20,7 +20,6 @@
 
 #include "itkImageToImageFilter.h"
 #include "itkScalarImageToRunLengthMatrixFilter.h"
-#include "itkStructHashFunction.h"
 #include "itksys/hash_set.hxx"
 
 
@@ -28,6 +27,8 @@ namespace itk
 {
 namespace Statistics
 {
+
+
 /** \class ScalarImageToRunLengthFeaturesImageFilter
  *  \brief This class computes run length features for each voxel of
  *  a given image and a mask image if provided. The output image can then be
@@ -229,6 +230,52 @@ public:
   // End concept checking
 #endif
 
+  class IdentifierHashFunction
+  {
+  public:
+
+    /** Standard class typedefs. */
+    typedef IdentifierHashFunction Self;
+
+    IdentifierType operator()(const IndexType & key) const
+    {
+        const unsigned int dim = key.GetIndexDimension();
+        int hash = 0;
+        int tempHash = 0;
+        for( int i = 0; i<dim; i++)
+          {
+          tempHash = key[i];
+          for( int j = i - 1; j>=0; j--)
+            {
+            tempHash *= key[j];
+            }
+          hash += tempHash;
+          }
+      return key[0]+key[0]*key[1]+key[0]*key[1]*key[2];
+    }
+  };
+
+  class IdentifierEqualsFunction
+  {
+  public:
+
+    /** Standard class typedefs. */
+    typedef IdentifierHashFunction Self;
+
+    bool operator()(const IndexType & key1, const IndexType & key2) const
+      {
+      const unsigned int dim = key1.GetIndexDimension();
+      for(unsigned int i = 0; i<dim; i++)
+        {
+        if(key1[i] != key2[i])
+          {
+          return false;
+          }
+        }
+      return true;
+      }
+  };
+
 protected:
 
   ScalarImageToRunLengthFeaturesImageFilter();
@@ -251,7 +298,8 @@ protected:
 
 private:
 typedef typename itksys::hash_set< IndexType,
-                                    StructHashFunction< IndexType > > SetType;
+                                   IdentifierHashFunction,
+                                   IdentifierEqualsFunction > SetType;
 
   typename InputImageType::Pointer  m_DigitalisedInputImageg;
   NeighborhoodRadiusType            m_NeighborhoodRadius;

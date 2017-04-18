@@ -154,11 +154,20 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
   typename InputRegionType::SizeType  boolSize;
   IndexType            boolCurentInNeighborhoodIndex;
   typedef Image<bool, TInputImage::ImageDimension> BoolImageType;
+  unsigned int nbOfVoxel = 0;
   for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; i++ )
     {
     boolSize[i] = this->m_NeighborhoodRadius[i]*2 + 1;
     boolStart[i] = 0;
     boolCurentInNeighborhoodIndex[i] = m_NeighborhoodRadius[i];
+    if(i == 0)
+      {
+      nbOfVoxel = boolSize[i];
+      }
+    else
+      {
+      nbOfVoxel *= boolSize[i];
+      }
     }
   boolRegion.SetIndex(boolStart);
   boolRegion.SetSize(boolSize);
@@ -171,8 +180,12 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
   // Declaration of the variables usefull to iterate over the all image region
   bool isInImage;
+  SetType set(nbOfVoxel);
+//  set.resize(this->m_NeighborhoodRadius.Dimension*this->m_NeighborhoodRadius.Dimension*this->m_NeighborhoodRadius.Dimension);
   outputPixel = outputPtr->GetPixel(boolCurentInNeighborhoodIndex);
   typename OffsetVector::ConstIterator offsets;
+  const typename OffsetVector::ConstIterator firstOffsets = m_Offsets->Begin();
+  const typename OffsetVector::ConstIterator lastOffsets = m_Offsets->End();
 
   // Declaration of the variables usefull to iterate over the all the offsets
   OffsetType offset;
@@ -185,6 +198,8 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
   // Declaration of the variables usefull to iterate over the all neighborhood region
   PixelType curentInNeighborhoodPixelIntensity;
+  NeighborIndexType nb;
+  NeighborIndexType neighborhoodSize;
 
   // Declaration of the variables usefull to iterate over the run
   PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
@@ -200,7 +215,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
     NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalisedInputImageg, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
-
+    neighborhoodSize = inputNIt.Size();
     // Iteration over the all image region
     while( !inputNIt.IsAtEnd() )
       {
@@ -222,13 +237,14 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
         }
       totalNumberOfRuns = 0;
       // Iteration over all the offsets
-      for( offsets = m_Offsets->Begin(); offsets != m_Offsets->End(); ++offsets )
+
+      for( offsets = firstOffsets; offsets != lastOffsets; ++offsets )
         {
-        SetType set;
+        set.clear();
         offset = offsets.Value();
         this->NormalizeOffsetDirection(offset);
         // Iteration over the all neighborhood region
-        for(NeighborIndexType nb = 0; nb<inputNIt.Size(); ++nb)
+        for(nb = 0; nb<neighborhoodSize; ++nb)
           {
           curentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
           tempOffset = inputNIt.GetOffset(nb);
@@ -269,7 +285,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
             // gerrit patch). For all other bins, the bin is left close and right open.
             if ( pixelIntensity == curentInNeighborhoodPixelIntensity )
               {
-                set.insert(boolCurentInNeighborhoodIndex + iteratedOffset);
+                set.insert_noresize(boolCurentInNeighborhoodIndex + iteratedOffset);
                 pixelDistance++;
                 iteratedOffset += offset;
                 insideNeighborhood = this->IsInsideNeighborhood(iteratedOffset);
@@ -397,11 +413,12 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
   float offsetDistance = 0;
-  for( unsigned int i = 0; i < offset.GetOffsetDimension(); ++i)
+
+  for(int i = offset.GetOffsetDimension()-1; i>=0; i--)
     {
     offsetDistance += (offset[i]*m_Spacing[i])*(offset[i]*m_Spacing[i]);
     }
-  offsetDistance = std::pow(offsetDistance, 1.0/offset.GetOffsetDimension());
+  offsetDistance = std::sqrt(offsetDistance);
 
   int offsetDistanceBin = (int)(( offsetDistance*pixelDistance - m_MinDistance)/
           ( (m_MaxDistance - m_MinDistance) / m_NumberOfBinsPerAxis ));
