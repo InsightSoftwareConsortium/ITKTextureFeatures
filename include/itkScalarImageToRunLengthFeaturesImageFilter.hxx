@@ -87,36 +87,47 @@ void
 ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 ::BeforeThreadedGenerateData()
 {
-    typename TInputImage::Pointer maskPointer = TInputImage::New();
-    maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
-    this->m_DigitalisedInputImageg = InputImageType::New();
-    this->m_DigitalisedInputImageg->SetRegions(this->GetInput()->GetRequestedRegion());
-    this->m_DigitalisedInputImageg->CopyInformation(this->GetInput());
-    this->m_DigitalisedInputImageg->Allocate();
-    typedef itk::ImageRegionIterator< InputImageType> IteratorType;
-    IteratorType digitIt( this->m_DigitalisedInputImageg, this->m_DigitalisedInputImageg->GetLargestPossibleRegion() );
-    typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
-    ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
-    unsigned int binNumber;
-    while( !inputIt.IsAtEnd() )
+  typename TInputImage::Pointer maskPointer = TInputImage::New();
+  maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
+  this->m_DigitalisedInputImageg = InputImageType::New();
+  this->m_DigitalisedInputImageg->SetRegions(this->GetInput()->GetRequestedRegion());
+  this->m_DigitalisedInputImageg->CopyInformation(this->GetInput());
+  this->m_DigitalisedInputImageg->Allocate();
+  typedef itk::ImageRegionIterator< InputImageType> IteratorType;
+  IteratorType digitIt( this->m_DigitalisedInputImageg, this->m_DigitalisedInputImageg->GetLargestPossibleRegion() );
+  typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
+  ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
+  unsigned int binNumber;
+  while( !inputIt.IsAtEnd() )
+    {
+    if( maskPointer && maskPointer->GetPixel( inputIt.GetIndex() ) != this->m_InsidePixelValue )
       {
-      if( maskPointer && maskPointer->GetPixel( inputIt.GetIndex() ) != this->m_InsidePixelValue )
-        {
-          digitIt.Set(this->m_Min - 10);
-        }
-      else if(inputIt.Get() < this->m_Min || inputIt.Get() > this->m_Max)
-        {
-        digitIt.Set(this->m_Min - 1);
-        }
-      else
-        {
-        binNumber = ( inputIt.Get() - m_Min)/( (m_Max - m_Min) / m_NumberOfBinsPerAxis );
-        digitIt.Set(binNumber);
-        }
-      ++inputIt;
-      ++digitIt;
+      digitIt.Set(this->m_Min - 10);
       }
-      m_Spacing = this->GetInput()->GetSpacing();
+    else if(inputIt.Get() < this->m_Min || inputIt.Get() > this->m_Max)
+      {
+      digitIt.Set(this->m_Min - 1);
+      }
+    else
+      {
+      binNumber = ( inputIt.Get() - m_Min)/( (m_Max - m_Min) / m_NumberOfBinsPerAxis );
+      digitIt.Set(binNumber);
+      }
+    ++inputIt;
+    ++digitIt;
+    }
+  m_Spacing = this->GetInput()->GetSpacing();
+
+  // Support VectorImages by setting number of components on output.
+  typename TOutputImage::Pointer outputPtr = TOutputImage::New();
+  outputPtr = this->GetOutput();
+  int a = outputPtr->GetNumberOfComponentsPerPixel();
+  if ( 10 != outputPtr->GetNumberOfComponentsPerPixel() )
+    {
+    outputPtr->SetNumberOfComponentsPerPixel( 10 );
+    }
+  outputPtr->Allocate();
+  outputPtr->UpdateOutputData();
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -164,6 +175,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
   // Declaration of the variables usefull to iterate over the all image region
   bool isInImage;
+  outputPixel = outputPtr->GetPixel(boolCurentInNeighborhoodIndex);
   typename OffsetVector::ConstIterator offsets;
 
   // Declaration of the variables usefull to iterate over the all the offsets
