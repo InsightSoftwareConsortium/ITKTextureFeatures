@@ -195,7 +195,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
   OffsetType iteratedOffset;
   OffsetType tempOffset;
   unsigned int pixelDistance;
-  bool runLengthSegmentAlreadyVisited;
   bool insideNeighborhood;
 
   /// ***** Non-boundary Region *****
@@ -245,7 +244,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
           //Initialisation of the variables usefull to iterate over the run
           iteratedOffset = tempOffset + offset;
           pixelDistance = 0;
-          runLengthSegmentAlreadyVisited = false;
           insideNeighborhood = this->IsInsideNeighborhood(iteratedOffset);
           // Scan from the iterated pixel at index, following the direction of
           // offset. Run length is computed as the length of continuous pixel
@@ -260,12 +258,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
                 {
                 break;
                 }
-              }
-            // For the same offset, each run length segment can only be visited once
-            if (alreadyVisitedImage->GetPixel(boolCurentInNeighborhoodIndex + iteratedOffset) )
-              {
-              runLengthSegmentAlreadyVisited = true;
-              break;
               }
             pixelIntensity = inputNIt.GetPixel(iteratedOffset);
             // Special attention paid to boundaries of bins.
@@ -282,10 +274,6 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
               {
               break;
               }
-            }
-          if ( runLengthSegmentAlreadyVisited )
-            {
-            continue;
             }
           // Increase the coresponding bin in the histogram
           this->IncreaseHistograme(hist, totalNumberOfRuns,
