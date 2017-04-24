@@ -152,6 +152,12 @@ public:
   itkSetMacro( InsidePixelValue, PixelType );
   itkGetConstMacro( InsidePixelValue, PixelType );
 
+  /** Set the calculator to normalize the histogram (divide all bins by the
+    total frequency). Normalization is off by default. */
+  itkSetMacro(Normalize, bool);
+  itkGetConstMacro(Normalize, bool);
+  itkBooleanMacro(Normalize);
+
   typedef typename OutputImageType::PixelType OutputPixelType;
   typedef typename NumericTraits< OutputPixelType >::ScalarRealType OutputRealType;
 
@@ -169,7 +175,6 @@ protected:
   ScalarImageToTextureFeaturesImageFilter();
   virtual ~ScalarImageToTextureFeaturesImageFilter() {}
 
-  void NormalizeOffsetDirection(OffsetType &offset);
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
   void IncreaseHistograme(unsigned int **hist, unsigned int &totalNumberOfRuns,
                           const PixelType &curentInNeighborhoodPixelIntensity,
@@ -182,7 +187,7 @@ protected:
   virtual void BeforeThreadedGenerateData() ITK_OVERRIDE;
   virtual void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                                     ThreadIdType threadId) ITK_OVERRIDE;
-    virtual void UpdateOutputInformation() ITK_OVERRIDE;
+  virtual void UpdateOutputInformation() ITK_OVERRIDE;
 
 private:
   typename InputImageType::Pointer  m_DigitalisedInputImageg;
@@ -195,6 +200,8 @@ private:
   RealType                          m_MaxDistance;
   PixelType                         m_InsidePixelValue;
   typename TInputImage::SpacingType m_Spacing;
+  bool                              m_Normalize;
+
 };
 } // end of namespace Statistics
 } // end of namespace itk
