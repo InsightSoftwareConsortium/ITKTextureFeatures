@@ -67,20 +67,6 @@ ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage >
 
 }
 
-template<typename TInputImage, typename TOutputImage>
-DataObject::Pointer
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
-::MakeOutput(DataObjectPointerArraySizeType idx)
-{
-  DataObject::Pointer output;
-
-//  if (std::is_same<TInputImage, TInputImage>)
-//    {
-
-//    }
-
-}
-
 
 template<typename TInputImage, typename TOutputImage>
 void
@@ -121,12 +107,12 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
   // Support VectorImages by setting number of components on output.
   typename TOutputImage::Pointer outputPtr = TOutputImage::New();
   outputPtr = this->GetOutput();
-  if ( 10 != outputPtr->GetNumberOfComponentsPerPixel() )
-    {
-    outputPtr->SetNumberOfComponentsPerPixel( 10 );
-    }
+  if ( strcmp(outputPtr->GetNameOfClass(), "VectorImage") == 0 )
+      {
+      typedef typename TOutputImage::AccessorFunctorType AccessorFunctorType;
+      AccessorFunctorType::SetVectorLength( outputPtr, 10 );
+      }
   outputPtr->Allocate();
-  outputPtr->UpdateOutputData();
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -289,6 +275,21 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
       ++outputIt;
       }
     }
+}
+
+template<typename TInputImage, typename TOutputImage>
+void
+ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+::UpdateOutputInformation()
+{
+  // Call superclass's version
+  Superclass::UpdateOutputInformation();
+
+  if ( strcmp(this->GetOutput()->GetNameOfClass(), "VectorImage") == 0 )
+      {
+      typedef typename TOutputImage::AccessorFunctorType AccessorFunctorType;
+      AccessorFunctorType::SetVectorLength( this->GetOutput(), 10 );
+      }
 }
 
 template<typename TInputImage, typename TOutputImage>
