@@ -67,6 +67,15 @@ ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage >
 
 }
 
+template<typename TInputImage, typename TOutputImage>
+void
+ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+::SetOffset( const OffsetType offset )
+{
+  OffsetVectorPointer offsetVector = OffsetVector::New();
+  offsetVector->push_back( offset );
+  this->SetOffsets( offsetVector );
+}
 
 template<typename TInputImage, typename TOutputImage>
 void
