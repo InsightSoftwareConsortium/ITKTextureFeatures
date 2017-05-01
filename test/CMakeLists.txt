@@ -5,13 +5,13 @@ set(TEMP ${ITK_TEST_OUTPUT_DIR})
 
 set(ITK_TEST_DRIVER itkTestDriver)
 
-set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterCreationTest.cxx
+set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterInstantiationTest.cxx
                          ScalarImageToRunLengthFeaturesImageFilterTest.cxx
                          ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures.cxx
                          ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask.cxx
                          ScalarImageToRunLengthFeaturesImageFilterTestWithVectorImage.cxx
                          ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
-                         ScalarImageToTextureFeaturesImageFilterCreationTest.cxx
+                         ScalarImageToTextureFeaturesImageFilterInstantiationTest.cxx
                          ScalarImageToTextureFeaturesImageFilterTest.cxx
                          ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithoutMask.cxx
@@ -22,9 +22,11 @@ set(TestOutput ${ITK_TEST_OUTPUT_DIR})
 
 CreateTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesTests}")
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterCreationTest
+itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterInstantiationTest
   COMMAND TextureFeaturesTestDriver
-ScalarImageToRunLengthFeaturesImageFilterCreationTest)
+  ScalarImageToRunLengthFeaturesImageFilterInstantiationTest
+  DATA{${INPUTDATA}/Scan_CBCT_13R.nrrd}
+  DATA{${INPUTDATA}/SegmC_CBCT_13R.nrrd})
 
 itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask1
   COMMAND TextureFeaturesTestDriver
@@ -190,9 +192,11 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSepara
   0 1.25
   4)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterCreationTest
+itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterInstantiationTest
   COMMAND TextureFeaturesTestDriver
-ScalarImageToTextureFeaturesImageFilterCreationTest)
+  ScalarImageToTextureFeaturesImageFilterInstantiationTest
+  DATA{${INPUTDATA}/Scan_CBCT_13R.nrrd}
+  DATA{${INPUTDATA}/SegmC_CBCT_13R.nrrd})
 
 itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestWithoutMask1
   COMMAND TextureFeaturesTestDriver
