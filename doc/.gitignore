@@ -1,0 +1,11 @@
+*.aux
+*.bbl
+*.blg
+*.brf
+*.dvi
+*.log
+*.out
+*.pdf
+*.ps
+*.toc
+_minted-*/
