@@ -334,17 +334,15 @@ int main(int argc, char * argv[])
     typedef itk::ImageFileReader< InputImageType >      readerType;
     typedef itk::Neighborhood<typename InputImageType::PixelType,
       InputImageType::ImageDimension> NeighborhoodType;
-    NeighborhoodType hood;
+    NeighborhoodType neighborhood;
 
     // Create and setup a reader
     readerType::Pointer reader = readerType::New();
-    std::string inputFilename = argv[1];
-    reader->SetFileName( inputFilename.c_str() );
+    reader->SetFileName( argv[1] );
 
     // Create and setup a maskReader
     readerType::Pointer maskReader = readerType::New();
-    std::string maskFilename = argv[2];
-    maskReader->SetFileName( maskFilename.c_str() );
+    maskReader->SetFileName( argv[2] );
 
     // Apply the filter
     typedef itk::Statistics::ScalarImageToRunLengthFeaturesImageFilter
@@ -355,9 +353,8 @@ int main(int argc, char * argv[])
     filter->SetNumberOfBinsPerAxis(std::atoi(argv[4]));
     filter->SetPixelValueMinMax(std::atof(argv[5]),std::atof(argv[6]));
     filter->SetDistanceValueMinMax(std::atof(argv[7]),std::atof(argv[8]));
-    hood.SetRadius( std::atoi(argv[9]) );
-    filter->SetNeighborhoodRadius(hood.GetRadius());
-    filter->UpdateLargestPossibleRegion();
+    neighborhood.SetRadius( std::atoi(argv[9]) );
+    filter->SetNeighborhoodRadius(neighborhood.GetRadius());
 
     // Create and setup a writter
     typedef  itk::ImageFileWriter< OutputImageType  > WriterType;
@@ -365,7 +362,7 @@ int main(int argc, char * argv[])
     std::string outputFilename = argv[3];
     writer->SetFileName(outputFilename.c_str());
     writer->SetInput(filter->GetOutput());
-    writer->UpdateLargestPossibleRegion();
+    writer->Update();
 
   return EXIT_SUCCESS;
 }
@@ -384,20 +381,18 @@ if len(sys.argv) != 7:
                                     "<PixelValueMax> <NeighborhoodRadius>")
     sys.exit(1)
 
-im = itk.read(sys.argv[1])
-mask = itk.read(sys.argv[2])
+im = itk.imread(sys.argv[1])
+mask = itk.imread(sys.argv[2])
 
 filtr = itk.ScalarImageToTextureFeaturesImageFilter.New(im)
 filtr.SetMaskImage(mask)
 filtr.SetNumberOfBinsPerAxis(int(sys.argv[3]))
 filtr.SetPixelValueMinMax(int(sys.argv[4]), int(sys.argv[5]))
 filtr.SetNeighborhoodRadius([int(sys.argv[6]),int(sys.argv[6]),int(sys.argv[6])])
-filtr.Update()
 
-result = itk.Image.VF83.New()
 result = filtr.GetOutput()
 
-itk.write(result, "result.nrrd")
+itk.imwrite(result, "result.nrrd")
 \end{minted}
 \normalsize
 \newpage

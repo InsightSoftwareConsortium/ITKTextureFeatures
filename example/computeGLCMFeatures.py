@@ -15,7 +15,6 @@ filtr.SetNumberOfBinsPerAxis(int(sys.argv[3]))
 filtr.SetPixelValueMinMax(int(sys.argv[4]), int(sys.argv[5]))
 filtr.SetNeighborhoodRadius([int(sys.argv[6]),int(sys.argv[6]),int(sys.argv[6])])
 
-result = itk.VectorImage[itk.F,3].New()
 result = filtr.GetOutput()
 
 itk.imwrite(result, "result.nrrd")
