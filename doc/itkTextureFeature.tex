@@ -100,15 +100,38 @@ This document describes a new module implemented for the Insight Toolkit ITK
 \section{Introduction}
 \label{sec:intro}
 
-Texture is an intuitive concept heuristically but difficult to define precisely. It can be defined as series of homogeneous visual patterns that are observed in certain kinds of materials. Humans describe texture through qualitative concepts such as fine, coarse, granulated or smooth. These descriptions are not precise and, in addition, they are not quantitative. The texture quantification has been studied for a long time and a lot of different texture quantification and analysis techniques to do so exist. The work presented here explores texture quantification algorithms that provide a statistical description of the local texture of a 3D image and produces N-Dimensional texture maps. More importantly, the work here presented allows to obtain these outputs close to real-time.
+Texture is an intuitive concept heuristically but difficult to define
+precisely. It can be defined as series of homogeneous visual patterns that are
+observed in certain kinds of materials. Humans describe texture through
+qualitative concepts such as fine, coarse, granulated or smooth. These
+descriptions are not precise and, in addition, they are not quantitative. The
+texture quantification has been studied for a long time and many different texture quantification and analysis techniques exist. The work presented here explores texture quantification algorithms that provide a statistical description of the local texture of a 3D image and produces N-Dimensional texture maps. More importantly, the work here presented allows to obtain these outputs close to real-time.
 
-ITK already contains tools for texture analysis such as \doxygen{ScalarImageToTextureFeaturesFilter} or \doxygen{ScalarImageToRunLengthFeaturesFilter}. Each of these filters can be used in order to obtain a N-Dimensional texture map from a image.
+ITK already contains tools for texture analysis such as
+\doxygen{ScalarImageToTextureFeaturesFilter} or
+\doxygen{ScalarImageToRunLengthFeaturesFilter}. Each of these filters can be
+used in order to obtain a N-Dimensional texture characterization of an image.
 
-However, those filters are implemented to describe images globally and they are not optimized to be used to describe local texture features. Using the existing filters to compute texture features iteratively for each pixels's neighborhood, in order to build texture maps, quickly become too time consuming. This is especially so when dealing with high resolution data, such as micro computed tomography (mCT) or on large local neighborhoods of the input image.
+However, those filters are implemented to describe images globally and they
+are not optimized to be used to describe local texture features. Using the
+existing filters to compute texture features iteratively for each pixels's
+neighborhood, in order to build texture maps, quickly becomes too time
+consuming. This is especially so when dealing with high resolution data, such
+as micro computed tomography ($\mu$CT) or on large local neighborhoods of the input image.
 
-The chosen solution, described in this article, consist in creating a new itk module (called itkTextureFeature) dedicated to the computation of feature maps for N-Dimensional images. The filters implemented in itkTextureFeature computes the exact same features than \doxygen{ScalarImageToTextureFeaturesFilter} and \doxygen{ScalarImageToRunLengthFeaturesFilter}. However, the new algorithms are optimized (particularly thanks to multithreading, \doxygen{NeighborhoodIterator}, \doxygen{ImageBoundaryFacesCalculator}) to be able to compute the feature maps much faster.
+The chosen solution, described in this article, consists in creating a new ITK
+module (called itkTextureFeature) dedicated to the computation of feature maps
+for N-Dimensional images. The filters implemented in itkTextureFeature
+computes the exact same features as \doxygen{ScalarImageToTextureFeaturesFilter} and \doxygen{ScalarImageToRunLengthFeaturesFilter}. However, the new algorithms are optimized (particularly thanks to multithreading, \doxygen{NeighborhoodIterator}, \doxygen{ImageBoundaryFacesCalculator}) to be able to compute the feature maps much faster.
 
-All the features available in itkTextureFeature are presented in section \ref{sec:features}. Section \ref{sec:filterUsage} describes the filters specifications (templates, inputs, parameters) of each filter and how to customize the use of these filters to each different texture analysis application. Section \ref{sec:exemples} contain examples of code using itkTextureFeature filters in python and C++. Finally, sections \ref{sec:results} and \ref{sec:conclusions} present several scenarios, results and conclusions obtained with itkTextureFeature.
+All the features available in itkTextureFeature are presented in
+Section~\ref{sec:features}. Section~\ref{sec:filterUsage} describes the
+filters specifications (templates, inputs, parameters) of each filter and how
+to customize the use of these filters to each different texture analysis
+application. Section~\ref{sec:exemples} contain examples of code using
+itkTextureFeature filters in Python and C++. Finally,
+Sections~\ref{sec:results} and \ref{sec:conclusions} present several
+scenarios, results and conclusions obtained with itkTextureFeatures.
 \newpage
 \section{Features Available}
 \label{sec:features}
