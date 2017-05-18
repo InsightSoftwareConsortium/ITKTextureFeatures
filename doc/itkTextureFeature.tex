@@ -100,7 +100,7 @@ This document describes a new module implemented for the Insight Toolkit ITK
 \section{Introduction}
 \label{sec:intro}
 
-Texture is an intuitive concept heuristically but difficult to define precisely. It can be defined as series of homogeneous visual patterns that are observed in certain kinds of materials. Humans describe texture through qualitative concepts such as fine, coarse, granulated or smooth. These descriptions are not precise and, in addition, they are not quantitative. The texture quantification has been studied for a long time and a lot of different texture quantification and analysis techniques to do so exist. The work presented here explores texture quantification algorithms that provide a statistical description of the local texture of a 3D image and produces N-Dimensional texture maps. More importantly, the work here presented allows to obtain these outputs close to real-time. 
+Texture is an intuitive concept heuristically but difficult to define precisely. It can be defined as series of homogeneous visual patterns that are observed in certain kinds of materials. Humans describe texture through qualitative concepts such as fine, coarse, granulated or smooth. These descriptions are not precise and, in addition, they are not quantitative. The texture quantification has been studied for a long time and a lot of different texture quantification and analysis techniques to do so exist. The work presented here explores texture quantification algorithms that provide a statistical description of the local texture of a 3D image and produces N-Dimensional texture maps. More importantly, the work here presented allows to obtain these outputs close to real-time.
 
 ITK already contains tools for texture analysis such as \doxygen{ScalarImageToTextureFeaturesFilter} or \doxygen{ScalarImageToRunLengthFeaturesFilter}. Each of these filters can be used in order to obtain a N-Dimensional texture map from a image.
 
@@ -108,7 +108,7 @@ However, those filters are implemented to describe images globally and they are 
 
 The chosen solution, described in this article, consist in creating a new itk module (called itkTextureFeature) dedicated to the computation of feature maps for N-Dimensional images. The filters implemented in itkTextureFeature computes the exact same features than \doxygen{ScalarImageToTextureFeaturesFilter} and \doxygen{ScalarImageToRunLengthFeaturesFilter}. However, the new algorithms are optimized (particularly thanks to multithreading, \doxygen{NeighborhoodIterator}, \doxygen{ImageBoundaryFacesCalculator}) to be able to compute the feature maps much faster.
 
-All the features available in itkTextureFeature are presented in section \ref{sec:features}. Section \ref{sec:filterUsage} describes the filters specifications (templates, inputs, parameters) of each filter and how to customize the use of these filters to each different texture analysis application. Section \ref{sec:exemples} contain examples of code using itkTextureFeature filters in python and C++. Finally, sections \ref{sec:results} and \ref{sec:conclusions} present several scenarios, results and conclusions obtained with itkTextureFeature. 
+All the features available in itkTextureFeature are presented in section \ref{sec:features}. Section \ref{sec:filterUsage} describes the filters specifications (templates, inputs, parameters) of each filter and how to customize the use of these filters to each different texture analysis application. Section \ref{sec:exemples} contain examples of code using itkTextureFeature filters in python and C++. Finally, sections \ref{sec:results} and \ref{sec:conclusions} present several scenarios, results and conclusions obtained with itkTextureFeature.
 \newpage
 \section{Features Available}
 \label{sec:features}
@@ -128,7 +128,7 @@ The computation of co-occurrence features is based on the grey level co-occurren
 
 \doxygen{itkScalarImageToTextureFeaturesImageFilter} computes the following features from the co-occurrence matrix:
 
-\textbf{Energy} is a feature that measures the local uniformity of texture. The higher the energy value, the bigger the uniformity and organization of the texture. 
+\textbf{Energy} is a feature that measures the local uniformity of texture. The higher the energy value, the bigger the uniformity and organization of the texture.
 
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
 f_1 = \sum_{i,j}\nolimits g(i, j)^2
@@ -137,8 +137,8 @@ f_1 = \sum_{i,j}\nolimits g(i, j)^2
 \textbf{Entropy} is a feature that expresses the level of organization of a texture. A completely random distribution of grey-level intensities in the image volume would have very high entropy, while an image with the same grey-level across all pixels would have very low value of entropy.
 
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_2 = 
-  \begin{cases} 
+f_2 =
+  \begin{cases}
      \sum_{i,j}\nolimits g(i, j)log_2g(i,j)  & \text{if } g(i, j) \neq 0 \\
      0                                       & \text{if } g(i, j) = 0
   \end{cases}
@@ -146,7 +146,7 @@ f_2 =
 
 \textbf{Correlation} is a feature that measures the linear dependency of gray level values in the co-occurrence matrix.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_3 = \sum_{i,j}\nolimits \frac{(i-\mu)(j-\mu)g(i, j)}{\sigma^2} 
+f_3 = \sum_{i,j}\nolimits \frac{(i-\mu)(j-\mu)g(i, j)}{\sigma^2}
 \end{equation}
 
 \textbf{Inverse Difference Moment} (IDM) is a feature that measures the homogeneity of the image.  IDM will be low for in-homogeneous images, and a higher value for homogeneous images.
@@ -154,7 +154,7 @@ f_3 = \sum_{i,j}\nolimits \frac{(i-\mu)(j-\mu)g(i, j)}{\sigma^2}
 f_4 = \sum_{i,j}\nolimits \frac{1}{1+(i-j)^2}g(i, j)
 \end{equation}
 
-\textbf{Inertia} or \textbf{contrast} is a feature that measures local grey-level variation in the GLCM matrix. If the neighboring pixels in the texture are very similar in their grey-level values then the contrast in the image is very low. Contrast is 0 for a constant image. 
+\textbf{Inertia} or \textbf{contrast} is a feature that measures local grey-level variation in the GLCM matrix. If the neighboring pixels in the texture are very similar in their grey-level values then the contrast in the image is very low. Contrast is 0 for a constant image.
 
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
 f_5 = \sum_{i,j}\nolimits (i-j)^2g(i, j)
@@ -165,12 +165,12 @@ f_5 = \sum_{i,j}\nolimits (i-j)^2g(i, j)
 f_6 = \sum_{i,j}\nolimits ((i - \mu)+(j-\mu))^3g(i, j)
 \end{equation}
 
-\textbf{Cluster Prominence} is a feature that is also related to the perceptual symmetry of the image. When the cluster prominence value is high, the image is less symmetric. 
+\textbf{Cluster Prominence} is a feature that is also related to the perceptual symmetry of the image. When the cluster prominence value is high, the image is less symmetric.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
 f_7 = \sum_{i,j}\nolimits ((i - \mu)+(j-\mu))^4g(i, j)
 \end{equation}
 
-\textbf{Haralick's Correlation} is the original correlation measure designed by Haralick in 1973, and measures the linear dependence between pixels relative to each other. 
+\textbf{Haralick's Correlation} is the original correlation measure designed by Haralick in 1973, and measures the linear dependence between pixels relative to each other.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
 f_8 = \frac{\sum_{i,j}\nolimits (i,j)g(i,j)-\mu _t^2}{\sigma _t^2}
 \end{equation}
@@ -199,13 +199,13 @@ f_2 = \frac{\sum_{i,j}\nolimits g(i, j)j^2}{\sum_{i,j}\nolimits g(i, j)}
 \textbf{Grey level non-uniformity} (GLN) measures the similarity of grey-level values through out the texture. The GLN is expected small if the grey-level values are alike throughout the whole texture.
 
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_3 = \frac{\sum_{i}\nolimits (\sum_{j}\nolimits g(i, j))^2}{\sum_{i,j}\nolimits g(i, j)} 
+f_3 = \frac{\sum_{i}\nolimits (\sum_{j}\nolimits g(i, j))^2}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
-\textbf{Run length non-uniformity} (RLN) is a feature that measures the similarity of the length of runs through out the image. The RLN is expected small if the run lengths are alike through out the image. 
+\textbf{Run length non-uniformity} (RLN) is a feature that measures the similarity of the length of runs through out the image. The RLN is expected small if the run lengths are alike through out the image.
 
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_4 = \frac{\sum_{j}\nolimits (\sum_{i}\nolimits g(i, j))^2}{\sum_{i,j}\nolimits g(i, j)} 
+f_4 = \frac{\sum_{j}\nolimits (\sum_{i}\nolimits g(i, j))^2}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
 \textbf{Low grey level run emphasis} (LGRE) is orthogonal to SRE, and the value of the feature increases when the texture is dominated by many runs of low gray value.
@@ -213,30 +213,30 @@ f_4 = \frac{\sum_{j}\nolimits (\sum_{i}\nolimits g(i, j))^2}{\sum_{i,j}\nolimits
 f_5 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)}{i^2}}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
-\textbf{High grey level run emphasis} (HGRE) is orthogonal to LRE, and the metric increases when the texture is dominated by many runs of high gray value. 
+\textbf{High grey level run emphasis} (HGRE) is orthogonal to LRE, and the metric increases when the texture is dominated by many runs of high gray value.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_6 = \frac{\sum_{i,j}\nolimits g(i, j)i^2}{\sum_{i,j}\nolimits g(i, j)} 
+f_6 = \frac{\sum_{i,j}\nolimits g(i, j)i^2}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
 \textbf{Short run low grey level emphasis} (SRLGE) is a diagonal measurement that combines SRE and LGRE. The metric increases when the texture is dominated by many short runs of low gray value.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_7 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)}{i^2j^2}}{\sum_{i,j}\nolimits g(i, j)} 
+f_7 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)}{i^2j^2}}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
 \textbf{Short run high grey level emphasis} (SRHGE) is orthogonal to SRLGE and LRHGE and increases when the texture is dominated by short runs with high intensity levels.
 
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_8 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)i^2}{j^2}}{\sum_{i,j}\nolimits g(i, j)} 
+f_8 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)i^2}{j^2}}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
 \textbf{Long run low grey level emphasis} (LRLGE) is complementary to SRHGE, it increases when the texture is dominated by long runs that have low gray levels.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_9 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)j^2}{i^2}}{\sum_{i,j}\nolimits g(i, j)} 
+f_9 = \frac{\sum_{i,j}\nolimits \frac{g(i, j)j^2}{i^2}}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
-\textbf{Long run high grey level emphasis} (LRHGE) is the complementary metric to SRLGE and increases with a combination of long, high-gray value runs. 
+\textbf{Long run high grey level emphasis} (LRHGE) is the complementary metric to SRLGE and increases with a combination of long, high-gray value runs.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
-f_{10} = \frac{\sum_{i,j}\nolimits g(i, j)i^2j^2}{\sum_{i,j}\nolimits g(i, j)} 
+f_{10} = \frac{\sum_{i,j}\nolimits g(i, j)i^2j^2}{\sum_{i,j}\nolimits g(i, j)}
 \end{equation}
 
 \section{Filters usage}
@@ -273,7 +273,7 @@ Template Parameters:
 \begin{itemize}
  \item The input image type: a N dimensional image where the pixel type MUST be integer.
  \item The output image type: a N dimensional image where the pixel type MUST be a vector of floating points or an ImageVector.
-\end{itemize} 
+\end{itemize}
 
 Inputs and parameters:
 \begin{itemize}
@@ -290,7 +290,7 @@ Inputs and parameters:
 \subsection{Recomandations}
 \label{sec:recomandations}
 
-Using the itkTextureFeature's filters with the default settings will lead, in all likelihood, to meaningless results. In addition, those results might be really time consuming to compute. 
+Using the itkTextureFeature's filters with the default settings will lead, in all likelihood, to meaningless results. In addition, those results might be really time consuming to compute.
 
 To obtain significant results, most of the parameters need to be carefully chosen depending on the scale of the texture and resolution of the input data, the other parameters and the significant information that need to be revealed by the output. For example the pixel intensity range should be adapted to the actual range of the input data in order to obtain a larger amplitude in the output feature maps. The radius (of the neighborhood) should be chosen depending on the size of the anomaly/object that needs to be detected in the input image. The distance range should correspond, in most cases, to the longer run length possible in the neighborhood (it depend of the spacing in the input image, the radius of the neighborhood and the offset directions).The choices of the number of bins should be adapted to the intensity/run length variation that want to be observed as well as the intensity/distance ranges specified. Finally the offset direction can be adapted if the anomaly/object that needs to be detected is specific to one known direction of the input image.
 
@@ -400,7 +400,7 @@ itk.imwrite(result, "result.nrrd")
 \section{Results}
 \label{sec:results}
 
-We present concrete use case scenarios of the different filters of itkTextureFilters in this section. We used itkTextureFilters to characterize subchondral bone texture in temporomandibular joint (TMJ) Osteoarthritis (OA). To date, there is no single sign, symptom, or test that can clearly diagnose early stages of TMJ OA. However, it has been observed that changes in the subchondral bone occur in very early stages of this disease involving subchondral bone structural changes (texture) in the subchondral bone (i.e. bone marrow). 
+We present concrete use case scenarios of the different filters of itkTextureFilters in this section. We used itkTextureFilters to characterize subchondral bone texture in temporomandibular joint (TMJ) Osteoarthritis (OA). To date, there is no single sign, symptom, or test that can clearly diagnose early stages of TMJ OA. However, it has been observed that changes in the subchondral bone occur in very early stages of this disease involving subchondral bone structural changes (texture) in the subchondral bone (i.e. bone marrow).
 
 The different tools presented in this document aid detecting and highlighting those texture variations in order to help clinicians to detect  TMJ OA earlier.
 
