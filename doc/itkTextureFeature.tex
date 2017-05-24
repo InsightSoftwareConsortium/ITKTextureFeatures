@@ -89,7 +89,7 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 % scope of the document.
 \begin{abstract}
 \noindent
-This document describes a new module implemented for the Insight Toolkit ITK
+This document describes a new remote module implemented for the Insight Toolkit ITK
   \url{www.itk.org}, itkTextureFeatures. This module contains two texture analysis filters that are used to compute feature maps of N-Dimensional images using two well-known texture analysis methods. The two filters contained in this module are itkScalarImageToTextureFeaturesImageFilter (which computes textural features based on intensity-based co-occurrence matrices in the image) and itkScalarImageToRunLengthFeaturesImageFilter (which computes textural features based on equally valued intensity clusters of different sizes or run lengths in the image). The output of this module is a vector image of the same size than the input that contains a multidimensional vector in each pixel/voxel. Filters can be configured based in the locality of the textural features (neighborhood size), offset directions for co-ocurrence and run length computation, the number of bins for the intensity histograms, the intensity range or the range of run lengths. This paper is accompanied with the source code, input data, parameters and output data that we have used for validating the algorithm described in this paper. This adheres to the fundamental principle that scientific publications must facilitate reproducibility of the reported results.
 
 \end{abstract}
@@ -121,7 +121,7 @@ consuming. This is especially so when dealing with high resolution data, such
 as micro computed tomography ($\mu$CT) or on large local neighborhoods of the input image.
 
 The chosen solution, described in this article, consists in creating a new ITK
-module (called itkTextureFeature) dedicated to the computation of feature maps
+remote module (called itkTextureFeature) dedicated to the computation of feature maps
 for N-Dimensional images. The filters implemented in itkTextureFeature
 computes the exact same features as \doxygen{ScalarImageToTextureFeaturesFilter} and \doxygen{ScalarImageToRunLengthFeaturesFilter}. However, the new algorithms are optimized (particularly thanks to multithreading, \doxygen{NeighborhoodIterator}, \doxygen{ImageBoundaryFacesCalculator}) to be able to compute the feature maps much faster.
 
