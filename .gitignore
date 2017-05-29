@@ -1,1 +1,6 @@
 CMakeLists.txt.user
+_skbuild
+dist
+ITK-*
+standalone-*
+itk_texturefeatures.egg-info
