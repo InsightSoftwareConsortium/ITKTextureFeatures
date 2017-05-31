@@ -1,18 +1,13 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: thewtex/centos-build:latest
+machine:
+  services:
+    - docker
 
-    working_directory: /usr/src/ITKTextureFeatures
+dependencies:
+  override:
+    - docker info
+    - docker pull thewtex/centos-build:latest
 
-    steps:
-      - checkout
-
-      - run:
-          name: build
-          command: ./createPythonWheels.sh
-
-      - store_artifacts:
-          path: /usr/src/ITKTextureFeatures/dist/
-          destination: 
+test:
+  override:
+    - ./createPythonWheels.sh
+    - cp -r dist $CIRCLE_ARTIFACTS
