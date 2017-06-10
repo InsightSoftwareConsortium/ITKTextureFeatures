@@ -22,59 +22,95 @@
 #include "itkImageFileReader.h"
 #include "itkTestingMacros.h"
 
-int ScalarImageToRunLengthFeaturesImageFilterInstantiationTest(int argc, char * argv[])
+int ScalarImageToRunLengthFeaturesImageFilterInstantiationTest( int argc, char *argv[] )
 {
-    // Setup types
-    typedef itk::Image< int, 3 >                        InputImageType;
-    typedef itk::Image< itk::Vector< float, 10 > , 3 >  OutputImageType;
-    typedef itk::ImageFileReader< InputImageType >      readerType;
-    typedef itk::Neighborhood<typename InputImageType::PixelType,
-      InputImageType::ImageDimension> NeighborhoodType;
-    NeighborhoodType hood;
+  if( argc < 3 )
+    {
+    std::cerr << "Missing parameters." << std::endl;
+    std::cerr << "Usage: " << argv[0]
+      << " inputImageFile"
+      << " maskImageFile" << std::endl;
+    return EXIT_FAILURE;
+    }
 
-    // Create and setup a reader
-    readerType::Pointer reader = readerType::New();
-    std::string inputFilename = argv[1];
-    reader->SetFileName( inputFilename.c_str() );
+  const unsigned int ImageDimension = 3;
+  const unsigned int VectorComponentDimension = 10;
 
-    // Create and setup a maskReader
-    readerType::Pointer maskReader = readerType::New();
-    std::string maskFilename = argv[2];
-    maskReader->SetFileName( maskFilename.c_str() );
+  // Declare types
+  typedef int                                         InputPixelType;
+  typedef float                                       OutputPixelComponentType;
+  typedef itk::Vector< OutputPixelComponentType, VectorComponentDimension >
+                                                      OutputPixelType;
 
-    // Apply the filter
-    typedef itk::Statistics::ScalarImageToRunLengthFeaturesImageFilter< InputImageType, OutputImageType > FilterType;
-    FilterType::Pointer filter = FilterType::New();
-
-    EXERCISE_BASIC_OBJECT_METHODS( filter,
-        ScalarImageToRunLengthFeaturesImageFilter, ImageToImageFilter );
-
-    hood.SetRadius( 3 );
-    NeighborhoodType::OffsetType offset = {{-1, 0, 1}};
-
-    filter->SetInput(reader->GetOutput());
-    filter->SetMaskImage(maskReader->GetOutput());
-    filter->SetNumberOfBinsPerAxis(15);
-    filter->SetPixelValueMinMax(-62, 2456);
-    filter->SetDistanceValueMinMax(0.15,1.5);
-    filter->SetNeighborhoodRadius(hood.GetRadius());
-    filter->SetInsidePixelValue( 0 );
-    filter->SetOffset( offset );
-
-    filter->UpdateLargestPossibleRegion();
-
-    TEST_SET_GET_VALUE(reader->GetOutput(), filter->GetInput());
-    TEST_SET_GET_VALUE(maskReader->GetOutput(), filter->GetMaskImage());
-    TEST_SET_GET_VALUE(15, filter->GetNumberOfBinsPerAxis());
-    TEST_SET_GET_VALUE(-62, filter->GetMin( ));
-    TEST_SET_GET_VALUE(2456, filter->GetMax( ));
-    TEST_SET_GET_VALUE(0.15, filter->GetMinDistance( ));
-    TEST_SET_GET_VALUE(1.5, filter->GetMaxDistance( ));
-    TEST_SET_GET_VALUE(hood.GetRadius(), filter->GetNeighborhoodRadius());
-    TEST_SET_GET_VALUE( 0, filter->GetInsidePixelValue());
-
-    filter->UpdateLargestPossibleRegion();
+  typedef itk::Image< InputPixelType, ImageDimension >  InputImageType;
+  typedef itk::Image< OutputPixelType, ImageDimension > OutputImageType;
+  typedef itk::ImageFileReader< InputImageType >        ReaderType;
+  typedef itk::Neighborhood< typename InputImageType::PixelType,
+    InputImageType::ImageDimension >                    NeighborhoodType;
 
 
+  // Create and set up a reader
+  ReaderType::Pointer reader = ReaderType::New();
+  reader->SetFileName( argv[1] );
+
+  // Create and set up a maskReader
+  ReaderType::Pointer maskReader = ReaderType::New();
+  maskReader->SetFileName( argv[2] );
+
+  // Create the filter
+  typedef itk::Statistics::ScalarImageToRunLengthFeaturesImageFilter<
+    InputImageType, OutputImageType > FilterType;
+
+  FilterType::Pointer filter = FilterType::New();
+
+  EXERCISE_BASIC_OBJECT_METHODS( filter,
+    ScalarImageToRunLengthFeaturesImageFilter, ImageToImageFilter );
+
+
+  filter->SetInput( reader->GetOutput() );
+
+  filter->SetMaskImage( maskReader->GetOutput() );
+  TEST_SET_GET_VALUE( maskReader->GetOutput(), filter->GetMaskImage() );
+
+  unsigned int numberOfBinsPerAxis = 15;
+  filter->SetNumberOfBinsPerAxis( numberOfBinsPerAxis );
+  TEST_SET_GET_VALUE( numberOfBinsPerAxis, filter->GetNumberOfBinsPerAxis() );
+
+  FilterType::PixelType pixelValueMin = -62;
+  FilterType::PixelType pixelValueMax = 2456;
+  filter->SetPixelValueMinMax( pixelValueMin, pixelValueMax );
+  TEST_SET_GET_VALUE( pixelValueMin, filter->GetMin() );
+  TEST_SET_GET_VALUE( pixelValueMax, filter->GetMax() );
+
+  FilterType::RealType minDistance = 0.15;
+  FilterType::RealType maxDistance = 1.5;
+  filter->SetDistanceValueMinMax( minDistance, maxDistance );
+  TEST_SET_GET_VALUE( minDistance, filter->GetMinDistance() );
+  TEST_SET_GET_VALUE( maxDistance, filter->GetMaxDistance() );
+
+  NeighborhoodType::SizeValueType neighborhoodRadius = 3;
+  NeighborhoodType hood;
+  hood.SetRadius( neighborhoodRadius );
+  filter->SetNeighborhoodRadius( hood.GetRadius() );
+  TEST_SET_GET_VALUE( hood.GetRadius(), filter->GetNeighborhoodRadius() );
+
+  FilterType::PixelType insidePixelValue = 0;
+  filter->SetInsidePixelValue( insidePixelValue );
+  TEST_SET_GET_VALUE( insidePixelValue, filter->GetInsidePixelValue() );
+
+  FilterType::OffsetType offset = {{-1, 0, 1}};
+  FilterType::OffsetVector::Pointer offsetVector = FilterType::OffsetVector::New();
+  offsetVector->push_back( offset );
+  filter->SetOffsets( offsetVector );
+  TEST_SET_GET_VALUE( offsetVector, filter->GetOffsets() );
+
+  filter->SetOffsets( offsetVector );
+  TEST_SET_GET_VALUE( offsetVector, filter->GetOffsets() );
+
+
+  TRY_EXPECT_NO_EXCEPTION( filter->Update() );
+
+
+  std::cout << "Test finished." << std::endl;
   return EXIT_SUCCESS;
 }
