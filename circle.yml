@@ -5,7 +5,6 @@ machine:
 dependencies:
   override:
     - docker info
-    - docker pull thewtex/centos-build:latest
 
 test:
   override:
