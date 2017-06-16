@@ -12,7 +12,7 @@ except ImportError:
 
 setup(
     name='itk-texturefeatures',
-    version='1.0.0',
+    version='1.0.1',
     author='Insight Software Consortium',
     author_email='community@itk.org',
     packages=['itk'],
