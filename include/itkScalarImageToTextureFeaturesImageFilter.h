@@ -209,9 +209,9 @@ protected:
   virtual ~ScalarImageToTextureFeaturesImageFilter() {}
 
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
-  void ComputeFeatures( unsigned int **hist, const unsigned int &totalNumberOfFreq,
+  void ComputeFeatures( vnl_matrix<unsigned int> &hist, const unsigned int &totalNumberOfFreq,
                        typename TOutputImage::PixelType &outputPixel);
-  void ComputeMeansAndVariances(unsigned int **hist,
+  void ComputeMeansAndVariances(vnl_matrix<unsigned int> &hist,
                                 const unsigned int &totalNumberOfFreq,
                                 double & pixelMean,
                                 double & marginalMean,
