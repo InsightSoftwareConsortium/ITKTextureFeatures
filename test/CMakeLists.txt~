@@ -14,6 +14,18 @@ set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterInstantiationT
                          ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
                          itkTextureMovingHistogramImageFilterTest.cxx)
 
+set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cxx
+                         RunLengthTextureFeaturesImageFilterTest.cxx
+                         RunLengthTextureFeaturesImageFilterTestSeparateFeatures.cxx
+                         RunLengthTextureFeaturesImageFilterTestWithoutMask.cxx
+                         RunLengthTextureFeaturesImageFilterTestWithVectorImage.cxx
+                         RunLengthTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
+                         CoocurrenceTextureFeaturesImageFilterInstantiationTest.cxx
+                         CoocurrenceTextureFeaturesImageFilterTest.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestWithoutMask.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestWithVectorImage.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
 
 CreateTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesTests}")
 
@@ -227,14 +239,20 @@ itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFe
   --compare DATA{Baseline/resultSeparateFeatures_17.nrrd}
             ${ITK_TEST_OUTPUT_DIR}/resultVectorImageSeparateFeatures_17.nrrd
   --compare DATA{Baseline/resultSeparateFeatures_18.nrrd}
+<<<<<<< HEAD
             ${ITK_TEST_OUTPUT_DIR}/resultVectorImageSeparateFeatures_18.nrrd
   CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${ITK_TEST_OUTPUT_DIR}/resultVectorImageSeparateFeatures 10 0 4200 4)
+=======
+            ${TEMP}/resultVectorImageSeparateFeatures_18.nrrd
+  ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures
+  DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultVectorImageSeparateFeatures 10 0 4200 4)
 
 
 itk_add_test(NAME itkTextureMovingHistogramImageFilterTest1
       COMMAND TextureFeaturesTestDriver itkTextureMovingHistogramImageFilterTest
           DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
-          ${ITK_TEST_OUTPUT_DIR}/itkTextureFeatureImageFilterTest1.mha
+          ${TEMP}/itkTextureFeatureImageFilterTest1.mha
           5
       )
+>>>>>>> ENH: Import TextureMovingHistogramImageFilter from old repository

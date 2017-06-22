@@ -16,6 +16,7 @@ itk_module(TextureFeatures
     ITKCommon
     ITKStatistics
     ITKImageGrid
+    ITKMathematicalMorphology
   COMPILE_DEPENDS
     ITKImageSources
   TEST_DEPENDS
