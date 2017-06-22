@@ -11,9 +11,21 @@ set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterInstantiationT
                          ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithoutMask.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithVectorImage.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
-                         itkTextureMovingHistogramImageFilterTest.cxx)
+                         ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
 
+set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cxx
+                         RunLengthTextureFeaturesImageFilterTest.cxx
+                         RunLengthTextureFeaturesImageFilterTestSeparateFeatures.cxx
+                         RunLengthTextureFeaturesImageFilterTestWithoutMask.cxx
+                         RunLengthTextureFeaturesImageFilterTestWithVectorImage.cxx
+                         RunLengthTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
+                         CoocurrenceTextureFeaturesImageFilterInstantiationTest.cxx
+                         CoocurrenceTextureFeaturesImageFilterTest.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestWithoutMask.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestWithVectorImage.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
+                         itkTextureMovingHistogramImageFilterTest.cxx)
 
 CreateTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesTests}")
 
