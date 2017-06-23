@@ -1,7 +1,7 @@
 itk_wrap_module(TextureFeatures)
 
 set(WRAPPER_SUBMODULE_ORDER
-   itkScalarImageToTextureFeaturesImageFilter
+   itkCoocurenceTextureFeaturesImageFilter
    itkScalarImageToRunLengthFeaturesImageFilter)
 
 itk_auto_load_submodules()
