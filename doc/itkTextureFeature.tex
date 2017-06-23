@@ -90,7 +90,7 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 \begin{abstract}
 \noindent
 This document describes a new remote module implemented for the Insight Toolkit ITK
-  \url{www.itk.org}, itkTextureFeatures. This module contains two texture analysis filters that are used to compute feature maps of N-Dimensional images using two well-known texture analysis methods. The two filters contained in this module are itkCoocurenceTextureFeaturesImageFilter (which computes textural features based on intensity-based co-occurrence matrices in the image) and itkScalarImageToRunLengthFeaturesImageFilter (which computes textural features based on equally valued intensity clusters of different sizes or run lengths in the image). The output of this module is a vector image of the same size than the input that contains a multidimensional vector in each pixel/voxel. Filters can be configured based in the locality of the textural features (neighborhood size), offset directions for co-ocurrence and run length computation, the number of bins for the intensity histograms, the intensity range or the range of run lengths. This paper is accompanied with the source code, input data, parameters and output data that we have used for validating the algorithm described in this paper. This adheres to the fundamental principle that scientific publications must facilitate reproducibility of the reported results.
+  \url{www.itk.org}, itkTextureFeatures. This module contains two texture analysis filters that are used to compute feature maps of N-Dimensional images using two well-known texture analysis methods. The two filters contained in this module are itkCoocurenceTextureFeaturesImageFilter (which computes textural features based on intensity-based co-occurrence matrices in the image) and itkRunLengthTextureFeaturesImageFilter (which computes textural features based on equally valued intensity clusters of different sizes or run lengths in the image). The output of this module is a vector image of the same size than the input that contains a multidimensional vector in each pixel/voxel. Filters can be configured based in the locality of the textural features (neighborhood size), offset directions for co-ocurrence and run length computation, the number of bins for the intensity histograms, the intensity range or the range of run lengths. This paper is accompanied with the source code, input data, parameters and output data that we have used for validating the algorithm described in this paper. This adheres to the fundamental principle that scientific publications must facilitate reproducibility of the reported results.
 
 \end{abstract}
 
@@ -202,13 +202,13 @@ f_8 = \frac{\sum_{i,j}\nolimits (i,j)g(i,j)-\mu _t^2}{\sigma _t^2}
 \subsection{Run length features}
 \label{sec:RLFeat}
 
-The computation of the run length features is based on the grey level run length matrix (GLRLM) computed inside \doxygen{itkScalarImageToRunLengthFeaturesImageFilter} for each pixel's neighborhood. A grey-level run is a set of consecutive, collinear picture points having the same grey-level value. The length of the run is the number of picture points in the run. The GLRLM matrix describes each neighborhood local texture. \cite{RLFeat1,RLFeat2,RLFeat3,RLFeat4}. In the following computations the nomenclature is as follows:
+The computation of the run length features is based on the grey level run length matrix (GLRLM) computed inside \doxygen{itkRunLengthTextureFeaturesImageFilter} for each pixel's neighborhood. A grey-level run is a set of consecutive, collinear picture points having the same grey-level value. The length of the run is the number of picture points in the run. The GLRLM matrix describes each neighborhood local texture. \cite{RLFeat1,RLFeat2,RLFeat3,RLFeat4}. In the following computations the nomenclature is as follows:
 
 \begin{math} g(i,j) \end{math} is the element in the cell \begin{math}(i,j)\end{math} of the normalized GLRLM
 
 \begin{math} i \end{math} is related the pixel intensity and \begin{math} j \end{math} to the length of the run
 
-\doxygen{itkScalarImageToRunLengthFeaturesImageFilter} computes the following features:
+\doxygen{itkRunLengthTextureFeaturesImageFilter} computes the following features:
 
 \textbf{Short run emphasis} (SRE) measures the distribution of short runs. SRE is expected large for fine textures.
 \begin{equation} \label{eqn:ShapeInfluenceTerm}
@@ -288,7 +288,7 @@ Inputs and parameters:
  \item The size of the neighborhood radius. (Optional, defaults to 2.)
 \end{itemize}
 
-\subsection{itkScalarImageToRunLengthFeaturesImageFilter}
+\subsection{itkRunLengthTextureFeaturesImageFilter}
 \label{sec:RLFilter}
 
 For each pixel of the input image, the itkCoocurenceTextureFeaturesImageFilter will compute a serie of 10 run length texture features which will be contain in a vector. That way the output of the filter is a N-D image where each pixel will contain a vector of 10 scalars. Each texture map can be extracted from the output image afterward thanks to \doxygen{NthElementImageAdaptor}. By default the texture features are computed for each spatial direction and averaged afterward.
@@ -331,7 +331,7 @@ The memory problem due to too large output data can also be solved by separating
 \label{sec:C++Ex}
 
 \begin{minted}[baselinestretch=1,fontsize=\footnotesize,linenos=false]{cpp}
-#include "itkScalarImageToRunLengthFeaturesImageFilter.h"
+#include "itkRunLengthTextureFeaturesImageFilter.h"
 
 #include "itkImage.h"
 #include "itkVector.h"
@@ -370,7 +370,7 @@ int main(int argc, char * argv[])
     maskReader->SetFileName( argv[2] );
 
     // Apply the filter
-    typedef itk::Statistics::ScalarImageToRunLengthFeaturesImageFilter
+    typedef itk::Statistics::RunLengthTextureFeaturesImageFilter
                                 < InputImageType, OutputImageType > FilterType;
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(reader->GetOutput());
@@ -495,7 +495,7 @@ It seems that, the energy (figure \ref{fig:Energy&Entropy}), the entropy (figure
 
 
 
-\subsection{itkScalarImageToRunLengthFeaturesImageFilter}
+\subsection{itkRunLengthTextureFeaturesImageFilter}
 \label{RLResults}
 
 The results exposed in this part were obtained by specifying the following parameters (the default parameters were used for the other ones):
@@ -559,7 +559,7 @@ The results exposed in this part were obtained by specifying the following param
   \end{center}
 \end{figure}
 
-Similarly to itkCoocurenceTextureFeaturesImageFilter, some output feature maps of itkScalarImageToRunLengthFeaturesImageFilter characterize bone texture and provide discriminant values of low and high density bone texture. Run length non uniformity (figure \ref{fig:NonUniformity}), short run emphasis (figure \ref{fig:RunSize}), long run emphasis (figure \ref{fig:RunSize}), high grey level run emphasis (figure \ref{fig:GreyLevel}), short run high grey level run emphasis (figure \ref{fig:ShortRunGreyLevel}) and long run low grey level emphasis (figure \ref{fig:LongRunGreyLevel}) seem to have discriminant properties and differentiate healthy and pathological bone trabecula. Here again some feature maps are not helpful in this particular case.
+Similarly to itkCoocurenceTextureFeaturesImageFilter, some output feature maps of itkRunLengthTextureFeaturesImageFilter characterize bone texture and provide discriminant values of low and high density bone texture. Run length non uniformity (figure \ref{fig:NonUniformity}), short run emphasis (figure \ref{fig:RunSize}), long run emphasis (figure \ref{fig:RunSize}), high grey level run emphasis (figure \ref{fig:GreyLevel}), short run high grey level run emphasis (figure \ref{fig:ShortRunGreyLevel}) and long run low grey level emphasis (figure \ref{fig:LongRunGreyLevel}) seem to have discriminant properties and differentiate healthy and pathological bone trabecula. Here again some feature maps are not helpful in this particular case.
 
 \newpage
 \section{Conclusion}

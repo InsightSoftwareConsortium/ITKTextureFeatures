@@ -10,7 +10,7 @@ if len(sys.argv) != 9:
 im = itk.imread(sys.argv[1])
 mask = itk.imread(sys.argv[2])
 
-filtr = itk.ScalarImageToRunLengthFeaturesImageFilter.New(im)
+filtr = itk.RunLengthTextureFeaturesImageFilter.New(im)
 filtr.SetMaskImage(mask)
 filtr.SetNumberOfBinsPerAxis(int(sys.argv[3]))
 filtr.SetPixelValueMinMax(int(sys.argv[4]), int(sys.argv[5]))

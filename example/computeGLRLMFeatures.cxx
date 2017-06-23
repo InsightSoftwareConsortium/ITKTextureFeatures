@@ -1,4 +1,4 @@
-#include "itkScalarImageToRunLengthFeaturesImageFilter.h"
+#include "itkRunLengthTextureFeaturesImageFilter.h"
 
 #include "itkImage.h"
 #include "itkVector.h"
@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     maskReader->SetFileName( argv[2] );
 
     // Apply the filter
-    typedef itk::Statistics::ScalarImageToRunLengthFeaturesImageFilter
+    typedef itk::Statistics::RunLengthTextureFeaturesImageFilter
                                 < InputImageType, OutputImageType > FilterType;
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(reader->GetOutput());
