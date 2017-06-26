@@ -1,4 +1,4 @@
-#include "itkScalarImageToTextureFeaturesImageFilter.h"
+#include "itkCoocurrenceTextureFeaturesImageFilter.h"
 
 #include "itkImage.h"
 #include "itkVector.h"
@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
     maskReader->SetFileName( argv[2] );
 
     // Apply the filter
-    typedef itk::Statistics::ScalarImageToTextureFeaturesImageFilter
+    typedef itk::Statistics::CoocurrenceTextureFeaturesImageFilter
                                 < InputImageType, OutputImageType > FilterType;
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(reader->GetOutput());

@@ -15,10 +15,10 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef itkScalarImageToRunLengthFeaturesImageFilter_hxx
-#define itkScalarImageToRunLengthFeaturesImageFilter_hxx
+#ifndef itkRunLengthTextureFeaturesImageFilter_hxx
+#define itkRunLengthTextureFeaturesImageFilter_hxx
 
-#include "itkScalarImageToRunLengthFeaturesImageFilter.h"
+#include "itkRunLengthTextureFeaturesImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkNeighborhoodAlgorithm.h"
 
@@ -27,8 +27,8 @@ namespace itk
 namespace Statistics
 {
 template< typename TInputImage, typename TOutputImage>
-ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage >
-::ScalarImageToRunLengthFeaturesImageFilter() :
+RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
+::RunLengthTextureFeaturesImageFilter() :
     m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
     m_Min( NumericTraits<PixelType>::NonpositiveMin() ),
     m_Max( NumericTraits<PixelType>::max() ),
@@ -63,7 +63,7 @@ ScalarImageToRunLengthFeaturesImageFilter< TInputImage, TOutputImage >
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::SetOffset( const OffsetType offset )
 {
   OffsetVectorPointer offsetVector = OffsetVector::New();
@@ -73,7 +73,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::BeforeThreadedGenerateData()
 {
   typename TInputImage::Pointer maskPointer = TInputImage::New();
@@ -120,7 +120,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                        ThreadIdType threadId)
 {
@@ -282,7 +282,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::UpdateOutputInformation()
 {
   // Call superclass's version
@@ -297,7 +297,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::SetMaskImage(const InputImageType *image )
 {
   // Process object is not const-correct so the const_cast is required here
@@ -306,7 +306,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 const TInputImage *
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::GetMaskImage() const
 {
   if( this->GetNumberOfInputs() < 2 )
@@ -318,7 +318,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::SetPixelValueMinMax( PixelType min, PixelType max )
 {
   if( this->m_Min != min || this->m_Max != max )
@@ -331,7 +331,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::SetDistanceValueMinMax( RealType min, RealType max )
 {
   if( Math::NotExactlyEquals(this->m_MinDistance, min) || Math::NotExactlyEquals(this->m_MaxDistance, max) )
@@ -344,7 +344,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::NormalizeOffsetDirection(OffsetType &offset)
 {
   itkDebugMacro("old offset = " << offset << std::endl);
@@ -368,7 +368,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 bool
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::IsInsideNeighborhood(const OffsetType &iteratedOffset)
 {
   bool insideNeighborhood = true;
@@ -386,7 +386,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::IncreaseHistograme(unsigned int **hist, unsigned int &totalNumberOfRuns,
                      const PixelType &curentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
@@ -410,7 +410,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::ComputeFeatures( unsigned int **hist,const unsigned int &totalNumberOfRuns,
                    typename TOutputImage::PixelType &outputPixel)
 {
@@ -497,7 +497,7 @@ ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
 
 template<typename TInputImage, typename TOutputImage>
 void
-ScalarImageToRunLengthFeaturesImageFilter<TInputImage, TOutputImage>
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf( os, indent );

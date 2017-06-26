@@ -15,7 +15,7 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#include "itkScalarImageToRunLengthFeaturesImageFilter.h"
+#include "itkCoocurrenceTextureFeaturesImageFilter.h"
 
 #include "itkImage.h"
 #include "itkImageAlgorithm.h"
@@ -27,7 +27,7 @@
 #include "itkNthElementImageAdaptor.h"
 #include "itkTestingMacros.h"
 
-int ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures( int argc, char *argv[] )
+int CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures( int argc, char *argv[] )
 {
   if( argc < 4 )
     {
@@ -39,26 +39,22 @@ int ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures( in
       << " [numberOfBinsPerAxis]"
       << " [pixelValueMin]"
       << " [pixelValueMax]"
-      << " [minDistance]"
-      << " [maxDistance]"
       << " [neighborhoodRadius]" << std::endl;
     return EXIT_FAILURE;
     }
 
   const unsigned int ImageDimension = 3;
-  const unsigned int VectorComponentDimension = 10;
+  const unsigned int VectorComponentDimension = 8;
 
   // Declare types
-  typedef int                                         InputPixelType;
-  typedef float                                       OutputPixelComponentType;
-  typedef itk::Vector< OutputPixelComponentType, VectorComponentDimension >
-                                                      OutputPixelType;
+  typedef int   InputPixelType;
+  typedef float OutputPixelType;
 
-  typedef itk::Image< InputPixelType, ImageDimension >  InputImageType;
-  typedef itk::Image< OutputPixelType, ImageDimension > OutputImageType;
-  typedef itk::ImageFileReader< InputImageType >        ReaderType;
+  typedef itk::Image< InputPixelType, ImageDimension >        InputImageType;
+  typedef itk::VectorImage< OutputPixelType, ImageDimension > OutputImageType;
+  typedef itk::ImageFileReader< InputImageType >              ReaderType;
   typedef itk::Neighborhood< typename InputImageType::PixelType,
-    InputImageType::ImageDimension >                    NeighborhoodType;
+    InputImageType::ImageDimension >                          NeighborhoodType;
 
   // Create and set up a reader
   ReaderType::Pointer reader = ReaderType::New();
@@ -69,7 +65,7 @@ int ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures( in
   maskReader->SetFileName( argv[2] );
 
   // Create the filter
-  typedef itk::Statistics::ScalarImageToRunLengthFeaturesImageFilter<
+  typedef itk::Statistics::CoocurrenceTextureFeaturesImageFilter<
     InputImageType, OutputImageType > FilterType;
   FilterType::Pointer filter = FilterType::New();
 
@@ -85,11 +81,7 @@ int ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures( in
     FilterType::PixelType pixelValueMax = std::atof( argv[6] );
     filter->SetPixelValueMinMax( pixelValueMin, pixelValueMax );
 
-    FilterType::RealType minDistance = std::atof( argv[7] );
-    FilterType::RealType maxDistance = std::atof( argv[8] );
-    filter->SetDistanceValueMinMax( minDistance, maxDistance );
-
-    NeighborhoodType::SizeValueType neighborhoodRadius = std::atoi( argv[9] );
+    NeighborhoodType::SizeValueType neighborhoodRadius = std::atoi( argv[7] );
     NeighborhoodType hood;
     hood.SetRadius( neighborhoodRadius );
     filter->SetNeighborhoodRadius( hood.GetRadius() );
@@ -98,7 +90,7 @@ int ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures( in
   TRY_EXPECT_NO_EXCEPTION( filter->Update() );
 
 
-  typedef itk::Image< OutputPixelComponentType, ImageDimension > FeatureImageType;
+  typedef itk::Image< OutputPixelType, ImageDimension > FeatureImageType;
   typedef itk::VectorIndexSelectionCastImageFilter<
     OutputImageType, FeatureImageType > IndexSelectionType;
   IndexSelectionType::Pointer indexSelectionFilter = IndexSelectionType::New();
@@ -108,14 +100,14 @@ int ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures( in
     {
     indexSelectionFilter->SetIndex(i);
 
-    // Create and set up a writer
+    // Create and setup a writer
     typedef itk::ImageFileWriter< FeatureImageType > WriterType;
     WriterType::Pointer writer = WriterType::New();
     std::string outputFilename = argv[3];
     std::ostringstream ss;
-    ss << i;
+    ss << i + 1;
     std::string s = ss.str();
-    writer->SetFileName( outputFilename + "_" + s + ".nrrd" );
+    writer->SetFileName( outputFilename + "_1" + s + ".nrrd" );
     writer->SetInput( indexSelectionFilter->GetOutput() );
 
     TRY_EXPECT_NO_EXCEPTION( writer->Update() );

@@ -5,85 +5,85 @@ set(TEMP ${ITK_TEST_OUTPUT_DIR})
 
 set(ITK_TEST_DRIVER itkTestDriver)
 
-set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterInstantiationTest.cxx
-                         ScalarImageToRunLengthFeaturesImageFilterTest.cxx
-                         ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures.cxx
-                         ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask.cxx
-                         ScalarImageToRunLengthFeaturesImageFilterTestWithVectorImage.cxx
-                         ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
-                         ScalarImageToTextureFeaturesImageFilterInstantiationTest.cxx
-                         ScalarImageToTextureFeaturesImageFilterTest.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestWithoutMask.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestWithVectorImage.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
+set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cxx
+                         RunLengthTextureFeaturesImageFilterTest.cxx
+                         RunLengthTextureFeaturesImageFilterTestSeparateFeatures.cxx
+                         RunLengthTextureFeaturesImageFilterTestWithoutMask.cxx
+                         RunLengthTextureFeaturesImageFilterTestWithVectorImage.cxx
+                         RunLengthTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
+                         CoocurrenceTextureFeaturesImageFilterInstantiationTest.cxx
+                         CoocurrenceTextureFeaturesImageFilterTest.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestWithoutMask.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestWithVectorImage.cxx
+                         CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
 
 set(TestOutput ${ITK_TEST_OUTPUT_DIR})
 
 CreateTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesTests}")
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterInstantiationTest
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterInstantiationTest
   COMMAND TextureFeaturesTestDriver
-  ScalarImageToRunLengthFeaturesImageFilterInstantiationTest
+  RunLengthTextureFeaturesImageFilterInstantiationTest
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd})
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask1
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterTestWithoutMask1
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultTestWithoutMask1.nrrd}
             ${TEMP}/resultTestWithoutMask1.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask
+  RunLengthTextureFeaturesImageFilterTestWithoutMask
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultTestWithoutMask1.nrrd 10 0 4200 0 0.7 2)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask2
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterTestWithoutMask2
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultTestWithoutMask2.nrrd}
             ${TEMP}/resultTestWithoutMask2.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask
+  RunLengthTextureFeaturesImageFilterTestWithoutMask
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultTestWithoutMask2.nrrd 10 0 4200 0 1.25 4)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask3
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterTestWithoutMask3
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultTestWithoutMask3.nrrd}
             ${TEMP}/resultTestWithoutMask3.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestWithoutMask
+  RunLengthTextureFeaturesImageFilterTestWithoutMask
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultTestWithoutMask3.nrrd 10 0 4200 0 1.8 6)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterVectorlImage1
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterVectorlImage1
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultPartialImage1.nrrd}
             ${TEMP}/resultVectorImage1.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestWithVectorImage
+  RunLengthTextureFeaturesImageFilterTestWithVectorImage
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultVectorImage1.nrrd 10 0 4200 0 0.7 2)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterVectorImage2
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterVectorImage2
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultPartialImage2.nrrd}
             ${TEMP}/resultVectorImage2.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestWithVectorImage
+  RunLengthTextureFeaturesImageFilterTestWithVectorImage
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultVectorImage2.nrrd 10 0 4200 0 1.25 4)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterPartialImage1
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterPartialImage1
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultPartialImage1.nrrd}
             ${TEMP}/resultPartialImage1.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTest
+  RunLengthTextureFeaturesImageFilterTest
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultPartialImage1.nrrd 10 0 4200 0 0.7 2)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterPartialImage2
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterPartialImage2
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultPartialImage2.nrrd}
             ${TEMP}/resultPartialImage2.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTest
+  RunLengthTextureFeaturesImageFilterTest
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultPartialImage2.nrrd 10 0 4200 0 1.25 4)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestWholeImage
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterTestWholeImage
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultWholeImage.nrrd}
             ${TEMP}/resultWholeImage.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTest
+  RunLengthTextureFeaturesImageFilterTest
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultWholeImage.nrrd 10 0 4200 0 0.7 2)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterTestSeparateFeatures
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultSeparateFeatures_1.nrrd}
             ${TEMP}/resultSeparateFeatures_1.nrrd
@@ -105,10 +105,10 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures
             ${TEMP}/resultSeparateFeatures_9.nrrd
   --compare DATA{Baseline/resultSeparateFeatures_0.nrrd}
             ${TEMP}/resultSeparateFeatures_0.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestSeparateFeatures
+  RunLengthTextureFeaturesImageFilterTestSeparateFeatures
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultSeparateFeatures 10 0 4200 0 1.25 4)
 
-itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures
+itk_add_test(NAME RunLengthTextureFeaturesImageFilterTestVectorImageSeparateFeatures
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultSeparateFeatures_1.nrrd}
             ${TEMP}/resultVectorImageSeparateFeatures_1.nrrd
@@ -130,71 +130,71 @@ itk_add_test(NAME ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSepara
             ${TEMP}/resultVectorImageSeparateFeatures_9.nrrd
   --compare DATA{Baseline/resultSeparateFeatures_0.nrrd}
             ${TEMP}/resultVectorImageSeparateFeatures_0.nrrd
-  ScalarImageToRunLengthFeaturesImageFilterTestVectorImageSeparateFeatures
+  RunLengthTextureFeaturesImageFilterTestVectorImageSeparateFeatures
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultVectorImageSeparateFeatures 10 0 4200 0 1.25 4)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterInstantiationTest
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterInstantiationTest
   COMMAND TextureFeaturesTestDriver
-  ScalarImageToTextureFeaturesImageFilterInstantiationTest
+  CoocurrenceTextureFeaturesImageFilterInstantiationTest
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd})
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestWithoutMask1
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestWithoutMask1
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultTestWithoutMask4.nrrd}
             ${TEMP}/resultTestWithoutMask4.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestWithoutMask
+  CoocurrenceTextureFeaturesImageFilterTestWithoutMask
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultTestWithoutMask4.nrrd 10 0 4200 2)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestWithoutMask2
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestWithoutMask2
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultTestWithoutMask5.nrrd}
             ${TEMP}/resultTestWithoutMask5.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestWithoutMask
+  CoocurrenceTextureFeaturesImageFilterTestWithoutMask
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultTestWithoutMask5.nrrd 10 0 4200 4)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestWithoutMask3
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestWithoutMask3
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultTestWithoutMask6.nrrd}
             ${TEMP}/resultTestWithoutMask6.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestWithoutMask
+  CoocurrenceTextureFeaturesImageFilterTestWithoutMask
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultTestWithoutMask6.nrrd 10 0 4200 6)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterVectorlImage1
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterVectorlImage1
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultPartialImage3.nrrd}
             ${TEMP}/resultVectorImage3.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestWithVectorImage
+  CoocurrenceTextureFeaturesImageFilterTestWithVectorImage
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultVectorImage3.nrrd 10 0 4200 2)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterVectorImage2
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterVectorImage2
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultPartialImage4.nrrd}
             ${TEMP}/resultVectorImage4.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestWithVectorImage
+  CoocurrenceTextureFeaturesImageFilterTestWithVectorImage
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultVectorImage4.nrrd 10 0 4200 4)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterPartialImage1
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterPartialImage1
 COMMAND TextureFeaturesTestDriver
 --compare DATA{Baseline/resultPartialImage3.nrrd}
           ${TEMP}/resultPartialImage3.nrrd
-  ScalarImageToTextureFeaturesImageFilterTest
+  CoocurrenceTextureFeaturesImageFilterTest
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultPartialImage3.nrrd 10 0 4200 2)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterPartialImage2
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterPartialImage2
 COMMAND TextureFeaturesTestDriver
 --compare DATA{Baseline/resultPartialImage4.nrrd}
           ${TEMP}/resultPartialImage4.nrrd
-  ScalarImageToTextureFeaturesImageFilterTest
+  CoocurrenceTextureFeaturesImageFilterTest
   DATA{Input/Scan_CBCT_13R_D1_crop.nrrd} DATA{Input/SegmC_CBCT_13R_D1_crop.nrrd} ${TEMP}/resultPartialImage4.nrrd 10 0 4200 4)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestWholeImage
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestWholeImage
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultWholeImage2.nrrd}
             ${TEMP}/resultWholeImage2.nrrd
-  ScalarImageToTextureFeaturesImageFilterTest
+  CoocurrenceTextureFeaturesImageFilterTest
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultWholeImage2.nrrd 10 0 4200 2)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultSeparateFeatures_11.nrrd}
             ${TEMP}/resultSeparateFeatures_11.nrrd
@@ -212,10 +212,10 @@ itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures
             ${TEMP}/resultSeparateFeatures_17.nrrd
   --compare DATA{Baseline/resultSeparateFeatures_18.nrrd}
             ${TEMP}/resultSeparateFeatures_18.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures
+  CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultSeparateFeatures 10 0 4200 4)
 
-itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures
+itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures
   COMMAND TextureFeaturesTestDriver
   --compare DATA{Baseline/resultSeparateFeatures_11.nrrd}
             ${TEMP}/resultVectorImageSeparateFeatures_11.nrrd
@@ -233,5 +233,5 @@ itk_add_test(NAME ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparate
             ${TEMP}/resultVectorImageSeparateFeatures_17.nrrd
   --compare DATA{Baseline/resultSeparateFeatures_18.nrrd}
             ${TEMP}/resultVectorImageSeparateFeatures_18.nrrd
-  ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures
+  CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${TEMP}/resultVectorImageSeparateFeatures 10 0 4200 4)
