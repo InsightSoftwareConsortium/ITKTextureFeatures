@@ -17,12 +17,12 @@ itk_module(TextureFeatures
     ITKStatistics
     ITKImageGrid
     ITKMathematicalMorphology
-  COMPILE_DEPENDS
-    ITKImageSources
   TEST_DEPENDS
     ITKTestKernel
     ITKMetaIO
     ITKImageIntensity
+    ITKImageNoise
+    ITKGoogleTest
   DESCRIPTION
     "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT

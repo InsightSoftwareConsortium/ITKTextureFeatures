@@ -250,3 +250,9 @@ itk_add_test(NAME itkFirstOrderTextureFeaturesImageFilterTest1
           ${ITK_TEST_OUTPUT_DIR}/itkTextureFeatureImageFilterTest1.mha
           5
       )
+
+set(TextureFeaturesGTests
+  itkFirstOrderTextureFeaturesImageFilterGTest.cxx
+)
+
+CreateGoogleTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesGTests}")
