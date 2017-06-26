@@ -9,7 +9,7 @@ if len(sys.argv) != 7:
 im = itk.imread(sys.argv[1])
 mask = itk.imread(sys.argv[2])
 
-filtr = itk.CoocurenceTextureFeaturesImageFilter.New(im)
+filtr = itk.CoocurrenceTextureFeaturesImageFilter.New(im)
 filtr.SetMaskImage(mask)
 filtr.SetNumberOfBinsPerAxis(int(sys.argv[3]))
 filtr.SetPixelValueMinMax(int(sys.argv[4]), int(sys.argv[5]))
