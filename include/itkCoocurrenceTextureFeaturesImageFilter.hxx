@@ -77,7 +77,7 @@ void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::BeforeThreadedGenerateData()
 {
-  InputImageType * maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
+  const InputImageType * maskPointer = this->GetMaskImage();
   this->m_DigitalisedInputImageg = InputImageType::New();
   this->m_DigitalisedInputImageg->SetRegions(this->GetInput()->GetRequestedRegion());
   this->m_DigitalisedInputImageg->CopyInformation(this->GetInput());
@@ -418,7 +418,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
     {
     for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
       {
-      int k = hist[a][b];
       float frequency = hist[a][b] / (float)totalNumberOfFreq;
       pixelMean += a * frequency;
       marginalSums[a] += frequency;
