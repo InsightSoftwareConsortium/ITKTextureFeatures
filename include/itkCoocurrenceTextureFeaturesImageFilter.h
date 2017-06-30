@@ -209,10 +209,10 @@ protected:
   virtual ~CoocurrenceTextureFeaturesImageFilter() {}
 
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
-  void ComputeFeatures( vnl_matrix<unsigned int> &hist, const unsigned int &totalNumberOfFreq,
+  void ComputeFeatures(const vnl_matrix<unsigned int> &hist, const unsigned int totalNumberOfFreq,
                        typename TOutputImage::PixelType &outputPixel);
-  void ComputeMeansAndVariances(vnl_matrix<unsigned int> &hist,
-                                const unsigned int &totalNumberOfFreq,
+  void ComputeMeansAndVariances(const vnl_matrix<unsigned int> &hist,
+                                const unsigned int totalNumberOfFreq,
                                 double & pixelMean,
                                 double & marginalMean,
                                 double & marginalDevSquared,

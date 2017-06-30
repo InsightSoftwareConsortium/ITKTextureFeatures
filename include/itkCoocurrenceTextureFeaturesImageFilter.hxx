@@ -32,7 +32,8 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
     m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
     m_Min( NumericTraits<PixelType>::NonpositiveMin() ),
     m_Max( NumericTraits<PixelType>::max() ),
-    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() ){
+    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() )
+{
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfRequiredOutputs( 1 );
 
@@ -313,7 +314,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeFeatures( vnl_matrix<unsigned int> &hist,const unsigned int &totalNumberOfFreq,
+::ComputeFeatures( const vnl_matrix<unsigned int> &hist, const unsigned int totalNumberOfFreq,
                    typename TOutputImage::PixelType &outputPixel)
 {
     // Now get the various means and variances. This is takes two passes
@@ -390,8 +391,8 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeMeansAndVariances(vnl_matrix<unsigned int> &hist,
-                           const unsigned int &totalNumberOfFreq,
+::ComputeMeansAndVariances(const vnl_matrix<unsigned int> &hist,
+                           const unsigned int totalNumberOfFreq,
                            double & pixelMean,
                            double & marginalMean,
                            double & marginalDevSquared,
