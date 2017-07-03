@@ -46,7 +46,7 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 % Increment the release number whenever significant changes are made.
 % The author and/or editor can define 'significant' however they like.
-\release{1.0.1}
+\release{2.0.0}
 
 % At minimum, give your name and an email address.  You can include a
 % snail-mail address if you like.
@@ -123,13 +123,13 @@ as micro computed tomography ($\mu$CT) or on large local neighborhoods of the in
 The chosen solution, described in this article, consists in creating a new ITK
 remote module (called itkTextureFeature) dedicated to the computation of feature maps
 for N-Dimensional images. The filters implemented in itkTextureFeature
-computes the exact same features as \doxygen{CoocurrenceTextureFeaturesFilter} and \doxygen{ScalarImageToRunLengthFeaturesFilter}. However, the new algorithms are optimized (particularly thanks to multithreading, \doxygen{NeighborhoodIterator}, \doxygen{ImageBoundaryFacesCalculator}) to be able to compute the feature maps much faster.
+computes the exact same features as \doxygen{ScalarImageToTextureFeaturesFilter} and \doxygen{ScalarImageToRunLengthFeaturesFilter}. However, the new algorithms are optimized (particularly thanks to multithreading, \doxygen{NeighborhoodIterator}, \doxygen{ImageBoundaryFacesCalculator}) to be able to compute the feature maps much faster.
 
 All the features available in itkTextureFeature are presented in
 Section~\ref{sec:features}. Section~\ref{sec:filterUsage} describes the
 filters specifications (templates, inputs, parameters) of each filter and how
 to customize the use of these filters to each different texture analysis
-application. Section~\ref{sec:exemples} contain examples of code using
+application. Section~\ref{sec:examples} contain examples of code using
 itkTextureFeature filters in Python and C++. Finally,
 Sections~\ref{sec:results} and \ref{sec:conclusions} present several
 scenarios, results and conclusions obtained with itkTextureFeatures.
@@ -291,7 +291,7 @@ Inputs and parameters:
 \subsection{itkRunLengthTextureFeaturesImageFilter}
 \label{sec:RLFilter}
 
-For each pixel of the input image, the itkCoocurrenceTextureFeaturesImageFilter will compute a serie of 10 run length texture features which will be contain in a vector. That way the output of the filter is a N-D image where each pixel will contain a vector of 10 scalars. Each texture map can be extracted from the output image afterward thanks to \doxygen{NthElementImageAdaptor}. By default the texture features are computed for each spatial direction and averaged afterward.
+For each pixel of the input image, the itkRunLengthTextureFeaturesImageFilter will compute a serie of 10 run length texture features which will be contain in a vector. That way the output of the filter is a N-D image where each pixel will contain a vector of 10 scalars. Each texture map can be extracted from the output image afterward thanks to \doxygen{NthElementImageAdaptor}. By default the texture features are computed for each spatial direction and averaged afterward.
 
 Template Parameters:
 \begin{itemize}
@@ -311,8 +311,8 @@ Inputs and parameters:
  \item The size of the neighborhood radius. (Optional, defaults to 2.)
 \end{itemize}
 
-\subsection{Recomandations}
-\label{sec:recomandations}
+\subsection{Recommendations}
+\label{sec:recommendations}
 
 Using the itkTextureFeature's filters with the default settings will lead, in all likelihood, to meaningless results. In addition, those results might be really time consuming to compute.
 
@@ -323,9 +323,17 @@ The usage of a Region Of Interest (ROI) mask is strongly advised, it will reduce
 In addition to the settings, particular attention should be payed to the input data. Please consider cropping the input are to contain only areas that will be interesting for the analysis. This will both help improving the computation time, thanks to a better distribution of the threaded regions and avoiding memory problems due to too large output data (considering that the output data is 8 or 10 times bigger than the input data).
 
 The memory problem due to too large output data can also be solved by separating the output image containing all the feature maps into several images containing one feature map each thanks to the itk class \doxygen{VectorIndexSelectionCastImageFilter}.
+
+\subsection{Python wheels}
+\label{sec:PythonWheels}
+
+Python wheels allow to easily install itkTextureFeatures and all its dependencies in order to have this texture filters ready to use in python code.They have been generated for the three main operating systems (Mac, Linux and Windows) and three versions of python (2.7, 3.5 and 3.6).
+
+To install the python wheels use the following command-line: \$ pip install itk\_textureFextures
+
 \newpage
-\section{Practical exemples}
-\label{sec:exemples}
+\section{Practical examples}
+\label{sec:examples}
 
 \subsection{C++}
 \label{sec:C++Ex}
@@ -569,7 +577,7 @@ This document presented a new fast and efficient tool to compute textural featur
 
 \section*{Acknowledgements}
 
-This work was supported by the National Institute of Health (NIH) National Institute for Dental and Craniofacial Research (NIDCR) R01EB021391 (Textural Biomarkers of Arthritis for the Subchondral Bone in the Temporomandibular Joint). 
+This work was supported by the National Institute of Health (NIH) National Institute for Dental and Craniofacial Research (NIDCR) grant R01EB021391 (Textural Biomarkers of Arthritis for the Subchondral Bone in the Temporomandibular Joint), NIDCR grant R01DE024450  (Quantification of 3D bony Changes in Temporomandibular Joint Osteoarthritis) and National Institute of Biomedical Imaging and Bioengineering (NIBIB) grant R01EB021391 (Shape Analysis Toolbox for Medical Image Computing Projects). 
 
 We would like to thank Dr. Larry Wolford from the Baylor University Medical Center for kindly providing the bone specimens from which we obtained the scans used in the paper. We would like to thank Drs. Lucia Cevidanes, Erika Benavides and Antonio Ruellas at the University of Michigan School of Dentistry as well, for generating the CBCT scans that were processed with the filters presented in the paper.
 
