@@ -11,7 +11,7 @@ set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterInstantiationT
                          ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithoutMask.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithVectorImage.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
+                         )
 
 set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cxx
                          RunLengthTextureFeaturesImageFilterTest.cxx
@@ -25,7 +25,7 @@ set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cx
                          CoocurrenceTextureFeaturesImageFilterTestWithoutMask.cxx
                          CoocurrenceTextureFeaturesImageFilterTestWithVectorImage.cxx
                          CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
-                         itkTextureMovingHistogramImageFilterTest.cxx)
+                         itkFirstOrderTextureFeaturesImageFilterTest.cxx)
 
 CreateTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesTests}")
 
@@ -244,8 +244,8 @@ itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFe
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${ITK_TEST_OUTPUT_DIR}/resultVectorImageSeparateFeatures 10 0 4200 4)
 
 
-itk_add_test(NAME itkTextureMovingHistogramImageFilterTest1
-      COMMAND TextureFeaturesTestDriver itkTextureMovingHistogramImageFilterTest
+itk_add_test(NAME itkFirstOrderTextureFeaturesImageFilterTest1
+      COMMAND TextureFeaturesTestDriver itkFirstOrderTextureFeaturesImageFilterTest
           DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
           ${ITK_TEST_OUTPUT_DIR}/itkTextureFeatureImageFilterTest1.mha
           5
