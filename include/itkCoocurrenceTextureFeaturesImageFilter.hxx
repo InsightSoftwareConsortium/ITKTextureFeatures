@@ -32,7 +32,8 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
     m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
     m_Min( NumericTraits<PixelType>::NonpositiveMin() ),
     m_Max( NumericTraits<PixelType>::max() ),
-    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() ){
+    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() )
+{
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfRequiredOutputs( 1 );
 
@@ -76,7 +77,7 @@ void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::BeforeThreadedGenerateData()
 {
-  InputImageType * maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
+  const InputImageType * maskPointer = this->GetMaskImage();
   this->m_DigitalisedInputImageg = InputImageType::New();
   this->m_DigitalisedInputImageg->SetRegions(this->GetInput()->GetRequestedRegion());
   this->m_DigitalisedInputImageg->CopyInformation(this->GetInput());
@@ -181,13 +182,8 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
         continue;
         }
       // Initialisation of the histogram
-      for(unsigned int a = 0; a < m_NumberOfBinsPerAxis; a++)
-        {
-        for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
-          {
-          hist[a][b] = 0;
-          }
-        }
+      hist.fill(0);
+
       totalNumberOfFreq = 0;
       // Iteration over all the offsets
       for( offsets = m_Offsets->Begin(); offsets != m_Offsets->End(); ++offsets )
@@ -313,7 +309,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeFeatures( vnl_matrix<unsigned int> &hist,const unsigned int &totalNumberOfFreq,
+::ComputeFeatures( const vnl_matrix<unsigned int> &hist, const unsigned int totalNumberOfFreq,
                    typename TOutputImage::PixelType &outputPixel)
 {
     // Now get the various means and variances. This is takes two passes
@@ -390,8 +386,8 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeMeansAndVariances(vnl_matrix<unsigned int> &hist,
-                           const unsigned int &totalNumberOfFreq,
+::ComputeMeansAndVariances(const vnl_matrix<unsigned int> &hist,
+                           const unsigned int totalNumberOfFreq,
                            double & pixelMean,
                            double & marginalMean,
                            double & marginalDevSquared,
@@ -417,7 +413,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
     {
     for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
       {
-      int k = hist[a][b];
       float frequency = hist[a][b] / (float)totalNumberOfFreq;
       pixelMean += a * frequency;
       marginalSums[a] += frequency;
