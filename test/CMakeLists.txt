@@ -246,7 +246,7 @@ itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFe
 
 itk_add_test(NAME itkFirstOrderTextureFeaturesImageFilterTest1
       COMMAND TextureFeaturesTestDriver itkFirstOrderTextureFeaturesImageFilterTest
-          DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+          DATA{Input/cthead1.png}
           ${ITK_TEST_OUTPUT_DIR}/itkTextureFeatureImageFilterTest1.mha
           5
       )
