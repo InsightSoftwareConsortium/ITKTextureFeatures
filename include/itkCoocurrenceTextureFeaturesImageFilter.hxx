@@ -117,6 +117,16 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+::AfterThreadedGenerateData()
+{
+  // free internal image
+  this->m_DigitalisedInputImageg = ITK_NULLPTR;
+}
+
+
+template<typename TInputImage, typename TOutputImage>
+void
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                        ThreadIdType threadId)
 {
