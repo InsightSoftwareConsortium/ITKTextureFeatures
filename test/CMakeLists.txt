@@ -251,8 +251,11 @@ itk_add_test(NAME itkFirstOrderTextureFeaturesImageFilterTest1
           5
       )
 
-set(TextureFeaturesGTests
-  itkFirstOrderTextureFeaturesImageFilterGTest.cxx
-)
+if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.12" )
+  set(TextureFeaturesGTests
+    itkFirstOrderTextureFeaturesImageFilterGTest.cxx
+    )
 
-CreateGoogleTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesGTests}")
+  CreateGoogleTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesGTests}")
+
+endif()

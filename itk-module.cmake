@@ -10,6 +10,10 @@ file(READ "${MY_CURRENT_DIR}/README.rst" DOCUMENTATION)
 # By convention those modules outside of ITK are not prefixed with
 # ITK.
 
+if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.12" )
+  set(_GoogleTest_DEPENDS ITKGoogleTest)
+endif()
+
 # define the dependencies of the include module and the tests
 itk_module(TextureFeatures
   DEPENDS
@@ -22,7 +26,7 @@ itk_module(TextureFeatures
     ITKMetaIO
     ITKImageIntensity
     ITKImageNoise
-    ITKGoogleTest
+    ${_GoogleTest_DEPENDS}
   DESCRIPTION
     "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT
