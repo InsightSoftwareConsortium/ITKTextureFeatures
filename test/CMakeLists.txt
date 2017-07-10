@@ -11,7 +11,7 @@ set(TextureFeaturesTests ScalarImageToRunLengthFeaturesImageFilterInstantiationT
                          ScalarImageToTextureFeaturesImageFilterTestSeparateFeatures.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithoutMask.cxx
                          ScalarImageToTextureFeaturesImageFilterTestWithVectorImage.cxx
-                         ScalarImageToTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
+                         )
 
 set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cxx
                          RunLengthTextureFeaturesImageFilterTest.cxx
@@ -24,7 +24,8 @@ set(TextureFeaturesTests RunLengthTextureFeaturesImageFilterInstantiationTest.cx
                          CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures.cxx
                          CoocurrenceTextureFeaturesImageFilterTestWithoutMask.cxx
                          CoocurrenceTextureFeaturesImageFilterTestWithVectorImage.cxx
-                         CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx)
+                         CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures.cxx
+                         itkFirstOrderTextureFeaturesImageFilterTest.cxx)
 
 CreateTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesTests}")
 
@@ -241,3 +242,20 @@ itk_add_test(NAME CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFe
             ${ITK_TEST_OUTPUT_DIR}/resultVectorImageSeparateFeatures_18.nrrd
   CoocurrenceTextureFeaturesImageFilterTestVectorImageSeparateFeatures
   DATA{Input/Scan_CBCT_13R.nrrd} DATA{Input/SegmC_CBCT_13R.nrrd} ${ITK_TEST_OUTPUT_DIR}/resultVectorImageSeparateFeatures 10 0 4200 4)
+
+
+itk_add_test(NAME itkFirstOrderTextureFeaturesImageFilterTest1
+      COMMAND TextureFeaturesTestDriver itkFirstOrderTextureFeaturesImageFilterTest
+          DATA{Input/cthead1.png}
+          ${ITK_TEST_OUTPUT_DIR}/itkTextureFeatureImageFilterTest1.mha
+          5
+      )
+
+if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.12" )
+  set(TextureFeaturesGTests
+    itkFirstOrderTextureFeaturesImageFilterGTest.cxx
+    )
+
+  CreateGoogleTestDriver(TextureFeatures "${TextureFeatures-Test_LIBRARIES}" "${TextureFeaturesGTests}")
+
+endif()
