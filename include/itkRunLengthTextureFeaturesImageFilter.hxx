@@ -91,11 +91,11 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     {
     if( maskPointer && maskPointer->GetPixel( inputIt.GetIndex() ) != this->m_InsidePixelValue )
       {
-      digitIt.Set(this->m_Min - 10);
+      digitIt.Set(-10);
       }
     else if(inputIt.Get() < this->m_Min || inputIt.Get() >= this->m_Max)
       {
-      digitIt.Set(this->m_Min - 1);
+      digitIt.Set(-1);
       }
     else
       {
@@ -196,7 +196,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     while( !inputNIt.IsAtEnd() )
       {
       // If the voxel is outside of the mask, don't treat it
-      if( inputNIt.GetCenterPixel() < (this->m_Min - 5) ) //the pixel is outside of the mask
+      if( inputNIt.GetCenterPixel() < ( - 5) ) //the pixel is outside of the mask
         {
         progress.CompletedPixel();
         ++inputNIt;
@@ -224,7 +224,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
           curentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
           tempOffset = inputNIt.GetOffset(nb);
           // Cecking if the value is out-of-bounds or is outside the mask.
-          if( curentInNeighborhoodPixelIntensity < this->m_Min || //the pixel is outside of the mask or outside of bounds
+          if( curentInNeighborhoodPixelIntensity < 0 || //the pixel is outside of the mask or outside of bounds
             alreadyVisitedImage->GetPixel( boolCurentInNeighborhoodIndex + tempOffset) )
             {
             continue;
