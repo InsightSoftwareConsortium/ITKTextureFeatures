@@ -49,7 +49,7 @@ int CoocurrenceTextureFeaturesImageFilterTestWithVectorImage( int argc, char *ar
   typedef itk::Image< InputPixelType, ImageDimension >        InputImageType;
   typedef itk::VectorImage< OutputPixelType, ImageDimension > OutputImageType;
   typedef itk::ImageFileReader< InputImageType >              ReaderType;
-  typedef itk::Neighborhood< typename InputImageType::PixelType,
+  typedef itk::Neighborhood< InputImageType::PixelType,
     InputImageType::ImageDimension >                          NeighborhoodType;
 
   // Create and set up a reader

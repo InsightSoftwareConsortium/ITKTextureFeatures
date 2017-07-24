@@ -54,7 +54,7 @@ int RunLengthTextureFeaturesImageFilterTest( int argc, char *argv[] )
   typedef itk::Image< InputPixelType, ImageDimension >  InputImageType;
   typedef itk::Image< OutputPixelType, ImageDimension > OutputImageType;
   typedef itk::ImageFileReader< InputImageType >        ReaderType;
-  typedef itk::Neighborhood< typename InputImageType::PixelType,
+  typedef itk::Neighborhood< InputImageType::PixelType,
     InputImageType::ImageDimension >                    NeighborhoodType;
 
   // Create and set up a reader
