@@ -398,10 +398,10 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
   offsetDistance = std::sqrt(offsetDistance);
 
-  int offsetDistanceBin = (int)(( offsetDistance*pixelDistance - m_MinDistance)/
+  int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_MinDistance)/
           ( (m_MaxDistance - m_MinDistance) / (float)m_NumberOfBinsPerAxis ));
 
-  if (offsetDistanceBin < m_NumberOfBinsPerAxis)
+  if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ))
     {
     totalNumberOfRuns++;
     hist[curentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
