@@ -229,7 +229,7 @@ protected:
 
   void NormalizeOffsetDirection(OffsetType &offset);
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
-  void IncreaseHistograme(unsigned int **hist, unsigned int &totalNumberOfRuns,
+  void IncreaseHistogram(unsigned int **hist, unsigned int &totalNumberOfRuns,
                           const PixelType &curentInNeighborhoodPixelIntensity,
                           const OffsetType &offset, const unsigned int &pixelDistance);
   void ComputeFeatures( unsigned int **hist, const unsigned int &totalNumberOfRuns,
