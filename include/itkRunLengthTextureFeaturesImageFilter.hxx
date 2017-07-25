@@ -264,7 +264,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
               }
             }
           // Increase the coresponding bin in the histogram
-          this->IncreaseHistograme(hist, totalNumberOfRuns,
+          this->IncreaseHistogram(hist, totalNumberOfRuns,
                                    curentInNeighborhoodPixelIntensity,
                                    offset, pixelDistance);
           }
@@ -387,7 +387,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::IncreaseHistograme(unsigned int **hist, unsigned int &totalNumberOfRuns,
+::IncreaseHistogram(unsigned int **hist, unsigned int &totalNumberOfRuns,
                      const PixelType &curentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
@@ -398,10 +398,10 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
   offsetDistance = std::sqrt(offsetDistance);
 
-  int offsetDistanceBin = (int)(( offsetDistance*pixelDistance - m_MinDistance)/
+  int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_MinDistance)/
           ( (m_MaxDistance - m_MinDistance) / (float)m_NumberOfBinsPerAxis ));
 
-  if (offsetDistanceBin < m_NumberOfBinsPerAxis)
+  if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ))
     {
     totalNumberOfRuns++;
     hist[curentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
