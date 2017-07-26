@@ -49,7 +49,7 @@ RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
   hood.SetRadius( 1 );
 
   // Select all "previous" neighbors that are face+edge+vertex
-  // connected to the iterated pixel. Do not include the curentInNeighborhood pixel.
+  // connected to the iterated pixel. Do not include the currentInNeighborhood pixel.
   unsigned int centerIndex = hood.GetCenterNeighborhoodIndex();
   OffsetVectorPointer offsets = OffsetVector::New();
   for( unsigned int d = 0; d < centerIndex; d++ )
@@ -178,7 +178,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
 
   // Declaration of the variables useful to iterate over the all neighborhood region
-  PixelType curentInNeighborhoodPixelIntensity;
+  PixelType currentInNeighborhoodPixelIntensity;
 
   // Declaration of the variables useful to iterate over the run
   PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
@@ -223,10 +223,10 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
         // Iteration over the all neighborhood region
         for(NeighborIndexType nb = 0; nb<inputNIt.Size(); ++nb)
           {
-          curentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
+          currentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
           tempOffset = inputNIt.GetOffset(nb);
           // Checking if the value is out-of-bounds or is outside the mask.
-          if( curentInNeighborhoodPixelIntensity < 0 || // The pixel is outside of the mask or outside of bounds
+          if( currentInNeighborhoodPixelIntensity < 0 || // The pixel is outside of the mask or outside of bounds
             alreadyVisitedImage->GetPixel( boolCurentInNeighborhoodIndex + tempOffset) )
             {
             continue;
@@ -253,7 +253,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
             // Special attention paid to boundaries of bins.
             // For the last bin, it is left close and right close (following the previous
             // gerrit patch). For all other bins, the bin is left close and right open.
-            if ( pixelIntensity == curentInNeighborhoodPixelIntensity )
+            if ( pixelIntensity == currentInNeighborhoodPixelIntensity )
               {
                 alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
                 pixelDistance++;
@@ -267,7 +267,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
             }
           // Increase the corresponding bin in the histogram
           this->IncreaseHistogram(histogram, totalNumberOfRuns,
-                                   curentInNeighborhoodPixelIntensity,
+                                   currentInNeighborhoodPixelIntensity,
                                    offset, pixelDistance);
           }
         }
@@ -396,7 +396,7 @@ template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::IncreaseHistogram(unsigned int **histogram, unsigned int &totalNumberOfRuns,
-                     const PixelType &curentInNeighborhoodPixelIntensity,
+                     const PixelType &currentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
   float offsetDistance = 0;
@@ -412,7 +412,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ))
     {
     totalNumberOfRuns++;
-    histogram[curentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
+    histogram[currentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
     }
 }
 
