@@ -80,12 +80,12 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 {
   typename TInputImage::Pointer maskPointer = TInputImage::New();
   maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
-  this->m_DigitalisedInputImageg = InputImageType::New();
-  this->m_DigitalisedInputImageg->SetRegions(this->GetInput()->GetRequestedRegion());
-  this->m_DigitalisedInputImageg->CopyInformation(this->GetInput());
-  this->m_DigitalisedInputImageg->Allocate();
+  this->m_DigitalizedInputImage = InputImageType::New();
+  this->m_DigitalizedInputImage->SetRegions(this->GetInput()->GetRequestedRegion());
+  this->m_DigitalizedInputImage->CopyInformation(this->GetInput());
+  this->m_DigitalizedInputImage->Allocate();
   typedef itk::ImageRegionIterator< InputImageType> IteratorType;
-  IteratorType digitIt( this->m_DigitalisedInputImageg, this->m_DigitalisedInputImageg->GetLargestPossibleRegion() );
+  IteratorType digitIt( this->m_DigitalizedInputImage, this->m_DigitalizedInputImage->GetLargestPossibleRegion() );
   typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
   ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
   unsigned int binNumber;
@@ -153,14 +153,14 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
   boolRegion.SetIndex(boolStart);
   boolRegion.SetSize(boolSize);
-  alreadyVisitedImage->CopyInformation( this->m_DigitalisedInputImageg );
+  alreadyVisitedImage->CopyInformation( this->m_DigitalizedInputImage );
   alreadyVisitedImage->SetRegions( boolRegion );
   alreadyVisitedImage->Allocate();
 
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( this->m_DigitalisedInputImageg, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_DigitalizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
@@ -190,7 +190,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   /// ***** Non-boundary Region *****
   for ( ; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalisedInputImageg, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalizedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -510,7 +510,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 {
   Superclass::PrintSelf( os, indent );
 
-  itkPrintSelfObjectMacro( DigitalisedInputImageg );
+  itkPrintSelfObjectMacro( DigitalizedInputImage );
 
   os << indent << "NeighborhoodRadius: "
     << static_cast< typename NumericTraits<
