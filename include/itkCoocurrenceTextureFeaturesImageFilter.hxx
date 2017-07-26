@@ -52,8 +52,8 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
   NeighborhoodType hood;
   hood.SetRadius( 1 );
 
-  // select all "previous" neighbors that are face+edge+vertex
-  // connected to the iterated pixel. do not include the curentInNeighborhood pixel.
+  // Select all "previous" neighbors that are face+edge+vertex
+  // connected to the iterated pixel. Do not include the curentInNeighborhood pixel.
   unsigned int centerIndex = hood.GetCenterNeighborhoodIndex();
   OffsetVectorPointer offsets = OffsetVector::New();
   for( unsigned int d = 0; d < centerIndex; d++ )
@@ -116,7 +116,7 @@ void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::AfterThreadedGenerateData()
 {
-  // free internal image
+  // Free internal image
   this->m_DigitalisedInputImageg = ITK_NULLPTR;
 }
 
@@ -137,13 +137,13 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Creation of the output pixel type
   typename TOutputImage::PixelType outputPixel;
 
-  // Separation of the non-boundery region that will be processed in a different way
+  // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
   faceList = boundaryFacesCalculator( this->m_DigitalisedInputImageg, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
-  // Declaration of the variables usefull to iterate over the all image region
+  // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
   IndexType firstIndex;
   for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; i++ )
@@ -153,17 +153,17 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   outputPixel = outputPtr->GetPixel(firstIndex);
   typename OffsetVector::ConstIterator offsets;
 
-  // Declaration of the variables usefull to iterate over the all the offsets
+  // Declaration of the variables useful to iterate over the all the offsets
   OffsetType offset;
   unsigned int totalNumberOfFreq;
 
 
   vnl_matrix<unsigned int> hist(m_NumberOfBinsPerAxis, m_NumberOfBinsPerAxis);
 
-  // Declaration of the variables usefull to iterate over the all neighborhood region
+  // Declaration of the variables useful to iterate over the all neighborhood region
   PixelType curentInNeighborhoodPixelIntensity;
 
-  // Declaration of the variables usefull to iterate over the run
+  // Declaration of the variables useful to iterate over the run
   PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
   OffsetType tempOffset;
 
@@ -196,7 +196,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
         // Iteration over the all neighborhood region
         for(NeighborIndexType nb = 0; nb<inputNIt.Size(); ++nb)
           {
-          // Test if the curent voxel is in the mask and is the range of the image intensity sepcified
+          // Test if the curent voxel is in the mask and is the range of the image intensity specified
           curentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
           if( curentInNeighborhoodPixelIntensity < 0 )
             {
@@ -220,19 +220,19 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
               }
             }
 
-          // Test if the pointed voxel is in the mask and is the range of the image intensity sepcified
+          // Test if the pointed voxel is in the mask and is the range of the image intensity specified
           pixelIntensity = inputNIt.GetPixel(tempOffset);
           if(pixelIntensity< 0 )
             {
             continue;
             }
 
-          // Increase the coresponding bin in the histogram
+          // Increase the corresponding bin in the histogram
           totalNumberOfFreq++;
           hist[curentInNeighborhoodPixelIntensity][pixelIntensity]++;
           }
         }
-      // Compute the run lenght features
+      // Compute the run length features
       this->ComputeFeatures( hist, totalNumberOfFreq, outputPixel);
       outputIt.Set(outputPixel);
 
@@ -314,7 +314,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
                                    marginalDevSquared,
                                    pixelVariance);
 
-    // Finally compute the texture features. Another one pass.
+    // Finally compute the texture features. Another pass.
     MeasurementType energy      = NumericTraits< MeasurementType >::ZeroValue();
     MeasurementType entropy     = NumericTraits< MeasurementType >::ZeroValue();
     MeasurementType correlation = NumericTraits< MeasurementType >::ZeroValue();
