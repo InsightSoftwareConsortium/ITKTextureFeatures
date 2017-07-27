@@ -230,7 +230,7 @@ protected:
   void NormalizeOffsetDirection(OffsetType &offset);
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
   void IncreaseHistogram(unsigned int **hist, unsigned int &totalNumberOfRuns,
-                          const PixelType &curentInNeighborhoodPixelIntensity,
+                          const PixelType &currentInNeighborhoodPixelIntensity,
                           const OffsetType &offset, const unsigned int &pixelDistance);
   void ComputeFeatures( unsigned int **hist, const unsigned int &totalNumberOfRuns,
                        typename TOutputImage::PixelType &outputPixel);
@@ -243,7 +243,7 @@ protected:
     virtual void UpdateOutputInformation() ITK_OVERRIDE;
 
 private:
-  typename InputImageType::Pointer  m_DigitalisedInputImageg;
+  typename InputImageType::Pointer  m_DigitalizedInputImage;
   NeighborhoodRadiusType            m_NeighborhoodRadius;
   OffsetVectorPointer               m_Offsets;
   unsigned int                      m_NumberOfBinsPerAxis;

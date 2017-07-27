@@ -53,7 +53,7 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
   hood.SetRadius( 1 );
 
   // Select all "previous" neighbors that are face+edge+vertex
-  // connected to the iterated pixel. Do not include the curentInNeighborhood pixel.
+  // connected to the iterated pixel. Do not include the currentInNeighborhood pixel.
   unsigned int centerIndex = hood.GetCenterNeighborhoodIndex();
   OffsetVectorPointer offsets = OffsetVector::New();
   for( unsigned int d = 0; d < centerIndex; d++ )
@@ -108,7 +108,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   functorF->SetNumberOfThreads(this->GetNumberOfThreads());
 
   functorF->Update();
-  m_DigitalisedInputImageg = functorF->GetOutput();
+  m_DigitalizedInputImage = functorF->GetOutput();
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -117,7 +117,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::AfterThreadedGenerateData()
 {
   // Free internal image
-  this->m_DigitalisedInputImageg = ITK_NULLPTR;
+  this->m_DigitalizedInputImage = ITK_NULLPTR;
 }
 
 
@@ -140,7 +140,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( this->m_DigitalisedInputImageg, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_DigitalizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
@@ -161,7 +161,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   vnl_matrix<unsigned int> hist(m_NumberOfBinsPerAxis, m_NumberOfBinsPerAxis);
 
   // Declaration of the variables useful to iterate over the all neighborhood region
-  PixelType curentInNeighborhoodPixelIntensity;
+  PixelType currentInNeighborhoodPixelIntensity;
 
   // Declaration of the variables useful to iterate over the run
   PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
@@ -170,7 +170,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   /// ***** Non-boundary Region *****
   for (; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalisedInputImageg, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalizedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -196,14 +196,14 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
         // Iteration over the all neighborhood region
         for(NeighborIndexType nb = 0; nb<inputNIt.Size(); ++nb)
           {
-          // Test if the curent voxel is in the mask and is the range of the image intensity specified
-          curentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
-          if( curentInNeighborhoodPixelIntensity < 0 )
+          // Test if the current voxel is in the mask and is the range of the image intensity specified
+          currentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
+          if( currentInNeighborhoodPixelIntensity < 0 )
             {
             continue;
             }
 
-          // Test if the curent offset is still pointing to a voxel inside th neighborhood
+          // Test if the current offset is still pointing to a voxel inside th neighborhood
           tempOffset = inputNIt.GetOffset(nb) + offset;
           if(!(this->IsInsideNeighborhood(tempOffset)))
           {
@@ -229,7 +229,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
           // Increase the corresponding bin in the histogram
           totalNumberOfFreq++;
-          hist[curentInNeighborhoodPixelIntensity][pixelIntensity]++;
+          hist[currentInNeighborhoodPixelIntensity][pixelIntensity]++;
           }
         }
       // Compute the run length features
@@ -456,7 +456,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   Superclass::PrintSelf( os, indent );
 
-  itkPrintSelfObjectMacro( DigitalisedInputImageg );
+  itkPrintSelfObjectMacro( DigitalizedInputImage );
 
   os << indent << "NeighborhoodRadius"
     << static_cast< typename NumericTraits<

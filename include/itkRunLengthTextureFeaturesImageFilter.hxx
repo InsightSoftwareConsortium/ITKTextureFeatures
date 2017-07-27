@@ -34,7 +34,9 @@ RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
     m_Max( NumericTraits<PixelType>::max() ),
     m_MinDistance( NumericTraits<RealType>::ZeroValue() ),
     m_MaxDistance( NumericTraits<RealType>::max() ),
-    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() ){
+    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() ),
+    m_Spacing( 1.0 )
+{
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfRequiredOutputs( 1 );
 
@@ -47,7 +49,7 @@ RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
   hood.SetRadius( 1 );
 
   // Select all "previous" neighbors that are face+edge+vertex
-  // connected to the iterated pixel. Do not include the curentInNeighborhood pixel.
+  // connected to the iterated pixel. Do not include the currentInNeighborhood pixel.
   unsigned int centerIndex = hood.GetCenterNeighborhoodIndex();
   OffsetVectorPointer offsets = OffsetVector::New();
   for( unsigned int d = 0; d < centerIndex; d++ )
@@ -78,12 +80,12 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 {
   typename TInputImage::Pointer maskPointer = TInputImage::New();
   maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
-  this->m_DigitalisedInputImageg = InputImageType::New();
-  this->m_DigitalisedInputImageg->SetRegions(this->GetInput()->GetRequestedRegion());
-  this->m_DigitalisedInputImageg->CopyInformation(this->GetInput());
-  this->m_DigitalisedInputImageg->Allocate();
+  this->m_DigitalizedInputImage = InputImageType::New();
+  this->m_DigitalizedInputImage->SetRegions(this->GetInput()->GetRequestedRegion());
+  this->m_DigitalizedInputImage->CopyInformation(this->GetInput());
+  this->m_DigitalizedInputImage->Allocate();
   typedef itk::ImageRegionIterator< InputImageType> IteratorType;
-  IteratorType digitIt( this->m_DigitalisedInputImageg, this->m_DigitalisedInputImageg->GetLargestPossibleRegion() );
+  IteratorType digitIt( this->m_DigitalizedInputImage, this->m_DigitalizedInputImage->GetLargestPossibleRegion() );
   typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
   ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
   unsigned int binNumber;
@@ -151,14 +153,14 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
   boolRegion.SetIndex(boolStart);
   boolRegion.SetSize(boolSize);
-  alreadyVisitedImage->CopyInformation( this->m_DigitalisedInputImageg );
+  alreadyVisitedImage->CopyInformation( this->m_DigitalizedInputImage );
   alreadyVisitedImage->SetRegions( boolRegion );
   alreadyVisitedImage->Allocate();
 
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( this->m_DigitalisedInputImageg, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_DigitalizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
@@ -169,14 +171,14 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Declaration of the variables useful to iterate over the all the offsets
   OffsetType offset;
   unsigned int totalNumberOfRuns;
-  unsigned int **hist =  new unsigned int*[m_NumberOfBinsPerAxis];
-  for(unsigned int a= 0; a < m_NumberOfBinsPerAxis; a++)
+  unsigned int **histogram =  new unsigned int*[m_NumberOfBinsPerAxis];
+  for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
     {
-    hist[a] = new unsigned int[m_NumberOfBinsPerAxis];
+    histogram[axis] = new unsigned int[m_NumberOfBinsPerAxis];
     }
 
   // Declaration of the variables useful to iterate over the all neighborhood region
-  PixelType curentInNeighborhoodPixelIntensity;
+  PixelType currentInNeighborhoodPixelIntensity;
 
   // Declaration of the variables useful to iterate over the run
   PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
@@ -188,7 +190,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   /// ***** Non-boundary Region *****
   for (; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalisedInputImageg, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalizedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -208,7 +210,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
         {
         for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
           {
-          hist[a][b] = 0;
+          histogram[a][b] = 0;
           }
         }
       totalNumberOfRuns = 0;
@@ -221,10 +223,10 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
         // Iteration over the all neighborhood region
         for(NeighborIndexType nb = 0; nb<inputNIt.Size(); ++nb)
           {
-          curentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
+          currentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
           tempOffset = inputNIt.GetOffset(nb);
           // Checking if the value is out-of-bounds or is outside the mask.
-          if( curentInNeighborhoodPixelIntensity < 0 || // The pixel is outside of the mask or outside of bounds
+          if( currentInNeighborhoodPixelIntensity < 0 || // The pixel is outside of the mask or outside of bounds
             alreadyVisitedImage->GetPixel( boolCurentInNeighborhoodIndex + tempOffset) )
             {
             continue;
@@ -251,7 +253,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
             // Special attention paid to boundaries of bins.
             // For the last bin, it is left close and right close (following the previous
             // gerrit patch). For all other bins, the bin is left close and right open.
-            if ( pixelIntensity == curentInNeighborhoodPixelIntensity )
+            if ( pixelIntensity == currentInNeighborhoodPixelIntensity )
               {
                 alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
                 pixelDistance++;
@@ -264,13 +266,13 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
               }
             }
           // Increase the corresponding bin in the histogram
-          this->IncreaseHistogram(hist, totalNumberOfRuns,
-                                   curentInNeighborhoodPixelIntensity,
+          this->IncreaseHistogram(histogram, totalNumberOfRuns,
+                                   currentInNeighborhoodPixelIntensity,
                                    offset, pixelDistance);
           }
         }
       // Compute the run length features
-      this->ComputeFeatures( hist, totalNumberOfRuns, outputPixel);
+      this->ComputeFeatures( histogram, totalNumberOfRuns, outputPixel);
       outputIt.Set(outputPixel);
 
       progress.CompletedPixel();
@@ -278,6 +280,12 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
       ++outputIt;
       }
     }
+
+  for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
+    {
+    delete histogram[axis];
+    }
+  delete histogram;
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -387,8 +395,8 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::IncreaseHistogram(unsigned int **hist, unsigned int &totalNumberOfRuns,
-                     const PixelType &curentInNeighborhoodPixelIntensity,
+::IncreaseHistogram(unsigned int **histogram, unsigned int &totalNumberOfRuns,
+                     const PixelType &currentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
   float offsetDistance = 0;
@@ -404,14 +412,14 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ))
     {
     totalNumberOfRuns++;
-    hist[curentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
+    histogram[currentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
     }
 }
 
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeFeatures( unsigned int **hist,const unsigned int &totalNumberOfRuns,
+::ComputeFeatures( unsigned int **histogram,const unsigned int &totalNumberOfRuns,
                    typename TOutputImage::PixelType &outputPixel)
 {
   OutputRealType shortRunEmphasis = NumericTraits<OutputRealType>::ZeroValue();
@@ -434,7 +442,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     {
     for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
       {
-      OutputRealType frequency = hist[a][b];
+      OutputRealType frequency = histogram[a][b];
       if ( Math::ExactlyEquals(frequency, NumericTraits<OutputRealType>::ZeroValue()) )
         {
         continue;
@@ -502,31 +510,31 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 {
   Superclass::PrintSelf( os, indent );
 
-  itkPrintSelfObjectMacro( DigitalisedInputImageg );
+  itkPrintSelfObjectMacro( DigitalizedInputImage );
 
-  os << indent << "NeighborhoodRadius"
+  os << indent << "NeighborhoodRadius: "
     << static_cast< typename NumericTraits<
     NeighborhoodRadiusType >::PrintType >( m_NeighborhoodRadius ) << std::endl;
 
   itkPrintSelfObjectMacro( Offsets );
 
-  os << indent << "NumberOfBinsPerAxis" << m_NumberOfBinsPerAxis << std::endl;
-  os << indent << "Min"
+  os << indent << "NumberOfBinsPerAxis: " << m_NumberOfBinsPerAxis << std::endl;
+  os << indent << "Min: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Min )
     << std::endl;
-  os << indent << "Max"
+  os << indent << "Max: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Max )
     << std::endl;
-  os << indent << "MinDistance"
+  os << indent << "MinDistance: "
     << static_cast< typename NumericTraits< RealType >::PrintType >(
     m_MinDistance ) << std::endl;
-  os << indent << "MaxDistance"
+  os << indent << "MaxDistance: "
     << static_cast< typename NumericTraits< RealType >::PrintType >(
     m_MaxDistance ) << std::endl;
-  os << indent << "InsidePixelValue"
+  os << indent << "InsidePixelValue: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >(
     m_InsidePixelValue ) << std::endl;
-  os << indent << "Spacing"
+  os << indent << "Spacing: "
     << static_cast< typename NumericTraits<
     typename TInputImage::SpacingType >::PrintType >( m_Spacing ) << std::endl;
 }
