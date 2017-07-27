@@ -458,26 +458,23 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   itkPrintSelfObjectMacro( DigitalizedInputImage );
 
-  os << indent << "NeighborhoodRadius"
+  os << indent << "NeighborhoodRadius: "
     << static_cast< typename NumericTraits<
     NeighborhoodRadiusType >::PrintType >( m_NeighborhoodRadius ) << std::endl;
 
   itkPrintSelfObjectMacro( Offsets );
 
-  os << indent << "NumberOfBinsPerAxis" << m_NumberOfBinsPerAxis << std::endl;
-  os << indent << "Min"
+  os << indent << "NumberOfBinsPerAxis: " << m_NumberOfBinsPerAxis << std::endl;
+  os << indent << "Min: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Min )
     << std::endl;
-  os << indent << "Max"
+  os << indent << "Max: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Max )
     << std::endl;
-  os << indent << "InsidePixelValue"
+  os << indent << "InsidePixelValue: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >(
     m_InsidePixelValue ) << std::endl;
-  os << indent << "Spacing"
-    << static_cast< typename NumericTraits<
-    typename TInputImage::SpacingType >::PrintType >( m_Spacing ) << std::endl;
-  os << indent << "Normalize" << m_Normalize << std::endl;
+  os << indent << "Normalize: " << m_Normalize << std::endl;
 }
 } // end of namespace Statistics
 } // end of namespace itk

@@ -239,7 +239,6 @@ private:
   PixelType                         m_Min;
   PixelType                         m_Max;
   PixelType                         m_InsidePixelValue;
-  typename TInputImage::SpacingType m_Spacing;
   bool                              m_Normalize;
 
 
