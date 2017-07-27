@@ -266,9 +266,11 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
               }
             }
           // Increase the corresponding bin in the histogram
+
           this->IncreaseHistogram(histogram, totalNumberOfRuns,
-                                   currentInNeighborhoodPixelIntensity,
-                                   offset, pixelDistance);
+                                  currentInNeighborhoodPixelIntensity,
+                                  offset, pixelDistance);
+
           }
         }
       // Compute the run length features
@@ -283,9 +285,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
     {
-    delete histogram[axis];
+    delete[] histogram[axis];
     }
-  delete histogram;
+  delete[] histogram;
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -405,11 +407,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     offsetDistance += (offset[i]*m_Spacing[i])*(offset[i]*m_Spacing[i]);
     }
   offsetDistance = std::sqrt(offsetDistance);
-
   int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_MinDistance)/
           ( (m_MaxDistance - m_MinDistance) / (float)m_NumberOfBinsPerAxis ));
-
-  if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ))
+  if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ) && offsetDistanceBin >= 0)
     {
     ++totalNumberOfRuns;
     ++histogram[currentInNeighborhoodPixelIntensity][offsetDistanceBin];
