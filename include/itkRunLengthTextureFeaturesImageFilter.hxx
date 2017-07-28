@@ -52,7 +52,7 @@ RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
   // connected to the iterated pixel. Do not include the currentInNeighborhood pixel.
   unsigned int centerIndex = hood.GetCenterNeighborhoodIndex();
   OffsetVectorPointer offsets = OffsetVector::New();
-  for( unsigned int d = 0; d < centerIndex; d++ )
+  for( unsigned int d = 0; d < centerIndex; ++d )
     {
     OffsetType offset = hood.GetOffset( d );
     offsets->push_back( offset );
@@ -145,7 +145,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   IndexType            boolCurentInNeighborhoodIndex;
   typedef Image<bool, TInputImage::ImageDimension> BoolImageType;
   typename BoolImageType::Pointer alreadyVisitedImage = BoolImageType::New();
-  for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; i++ )
+  for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; ++i )
     {
     boolSize[i] = this->m_NeighborhoodRadius[i]*2 + 1;
     boolStart[i] = 0;
@@ -206,9 +206,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
         continue;
         }
       // Initialisation of the histogram
-      for(unsigned int a = 0; a < m_NumberOfBinsPerAxis; a++)
+      for(unsigned int a = 0; a < m_NumberOfBinsPerAxis; ++a)
         {
-        for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
+        for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; ++b)
           {
           histogram[a][b] = 0;
           }
@@ -256,7 +256,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
             if ( pixelIntensity == currentInNeighborhoodPixelIntensity )
               {
                 alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
-                pixelDistance++;
+                ++pixelDistance;
                 iteratedOffset += offset;
                 insideNeighborhood = this->IsInsideNeighborhood(iteratedOffset);
               }
@@ -266,9 +266,11 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
               }
             }
           // Increase the corresponding bin in the histogram
+
           this->IncreaseHistogram(histogram, totalNumberOfRuns,
-                                   currentInNeighborhoodPixelIntensity,
-                                   offset, pixelDistance);
+                                  currentInNeighborhoodPixelIntensity,
+                                  offset, pixelDistance);
+
           }
         }
       // Compute the run length features
@@ -283,9 +285,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
     {
-    delete histogram[axis];
+    delete[] histogram[axis];
     }
-  delete histogram;
+  delete[] histogram;
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -405,14 +407,12 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     offsetDistance += (offset[i]*m_Spacing[i])*(offset[i]*m_Spacing[i]);
     }
   offsetDistance = std::sqrt(offsetDistance);
-
   int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_MinDistance)/
           ( (m_MaxDistance - m_MinDistance) / (float)m_NumberOfBinsPerAxis ));
-
-  if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ))
+  if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ) && offsetDistanceBin >= 0)
     {
-    totalNumberOfRuns++;
-    histogram[currentInNeighborhoodPixelIntensity][offsetDistanceBin]++;
+    ++totalNumberOfRuns;
+    ++histogram[currentInNeighborhoodPixelIntensity][offsetDistanceBin];
     }
 }
 
@@ -438,9 +438,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   vnl_vector<double> runLengthNonuniformityVector(
     m_NumberOfBinsPerAxis, 0.0 );
 
-  for(unsigned int a = 0; a < m_NumberOfBinsPerAxis; a++)
+  for(unsigned int a = 0; a < m_NumberOfBinsPerAxis; ++a)
     {
-    for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; b++)
+    for(unsigned int b = 0; b < m_NumberOfBinsPerAxis; ++b)
       {
       OutputRealType frequency = histogram[a][b];
       if ( Math::ExactlyEquals(frequency, NumericTraits<OutputRealType>::ZeroValue()) )
