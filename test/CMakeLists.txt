@@ -251,7 +251,7 @@ itk_add_test(NAME itkFirstOrderTextureFeaturesImageFilterTest1
           5
       )
 
-if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.12" )
+if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.13" )
   set(TextureFeaturesGTests
     itkFirstOrderTextureFeaturesImageFilterGTest.cxx
     )

@@ -10,7 +10,7 @@ file(READ "${MY_CURRENT_DIR}/README.rst" DOCUMENTATION)
 # By convention those modules outside of ITK are not prefixed with
 # ITK.
 
-if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.12" )
+if( NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS "4.13" )
   set(_GoogleTest_DEPENDS ITKGoogleTest)
 endif()
 
