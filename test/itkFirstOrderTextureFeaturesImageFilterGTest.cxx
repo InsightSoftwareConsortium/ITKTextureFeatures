@@ -40,7 +40,7 @@ out << "entropy: " << p[7] << std::endl;
 
 }
 
-TEST(TextTureFeatures, FirstOrder_Test1)
+TEST(TextureFeatures, FirstOrder_Test1)
 {
   const unsigned int ImageDimension = 2;
   typedef itk::Image<float, ImageDimension >                    ImageType;
@@ -110,7 +110,7 @@ TEST(TextTureFeatures, FirstOrder_Test1)
 }
 
 
-TEST(TextTureFeatures, FirstOrder_Test2)
+TEST(TextureFeatures, FirstOrder_Test2)
 {
   const unsigned int ImageDimension = 2;
   typedef itk::Image<float, ImageDimension >                    ImageType;
