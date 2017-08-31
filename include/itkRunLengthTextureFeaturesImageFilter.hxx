@@ -30,10 +30,10 @@ template< typename TInputImage, typename TOutputImage>
 RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
 ::RunLengthTextureFeaturesImageFilter() :
     m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
-    m_Min( NumericTraits<PixelType>::NonpositiveMin() ),
-    m_Max( NumericTraits<PixelType>::max() ),
-    m_MinDistance( NumericTraits<RealType>::ZeroValue() ),
-    m_MaxDistance( NumericTraits<RealType>::max() ),
+    m_HistogramValueMinimum( NumericTraits<PixelType>::NonpositiveMin() ),
+    m_HistogramValueMaximum( NumericTraits<PixelType>::max() ),
+    m_HistogramDistanceMinimum( NumericTraits<RealType>::ZeroValue() ),
+    m_HistogramDistanceMaximum( NumericTraits<RealType>::max() ),
     m_InsidePixelValue( NumericTraits<PixelType>::OneValue() ),
     m_Spacing( 1.0 )
 {
@@ -95,13 +95,13 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
       {
       digitIt.Set(-10);
       }
-    else if(inputIt.Get() < this->m_Min || inputIt.Get() >= this->m_Max)
+    else if(inputIt.Get() < this->m_HistogramValueMinimum || inputIt.Get() >= this->m_HistogramValueMinimum)
       {
       digitIt.Set(-1);
       }
     else
       {
-      binNumber = ( inputIt.Get() - m_Min)/( (m_Max - m_Min) / (float)m_NumberOfBinsPerAxis );
+      binNumber = ( inputIt.Get() - m_HistogramValueMinimum)/( (m_HistogramValueMaximum - m_HistogramValueMinimum) / (float)m_NumberOfBinsPerAxis );
       digitIt.Set(binNumber);
       }
     ++inputIt;
@@ -331,32 +331,6 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::SetPixelValueMinMax( PixelType min, PixelType max )
-{
-  if( this->m_Min != min || this->m_Max != max )
-    {
-    this->m_Min = min;
-    this->m_Max = max;
-    this->Modified();
-    }
-}
-
-template<typename TInputImage, typename TOutputImage>
-void
-RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::SetDistanceValueMinMax( RealType min, RealType max )
-{
-  if( Math::NotExactlyEquals(this->m_MinDistance, min) || Math::NotExactlyEquals(this->m_MaxDistance, max) )
-    {
-    this->m_MinDistance = min;
-    this->m_MaxDistance = max;
-    this->Modified();
-    }
-}
-
-template<typename TInputImage, typename TOutputImage>
-void
-RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::NormalizeOffsetDirection(OffsetType &offset)
 {
   itkDebugMacro("old offset = " << offset << std::endl);
@@ -409,8 +383,8 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     offsetDistance += (offset[i]*m_Spacing[i])*(offset[i]*m_Spacing[i]);
     }
   offsetDistance = std::sqrt(offsetDistance);
-  int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_MinDistance)/
-          ( (m_MaxDistance - m_MinDistance) / (float)m_NumberOfBinsPerAxis ));
+  int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_HistogramDistanceMinimum)/
+          ( (m_HistogramDistanceMaximum - m_HistogramDistanceMinimum) / (float)m_NumberOfBinsPerAxis ));
   if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ) && offsetDistanceBin >= 0)
     {
     ++totalNumberOfRuns;
@@ -522,17 +496,17 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   os << indent << "NumberOfBinsPerAxis: " << m_NumberOfBinsPerAxis << std::endl;
   os << indent << "Min: "
-    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Min )
+    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_HistogramValueMinimum )
     << std::endl;
   os << indent << "Max: "
-    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Max )
+    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_HistogramValueMaximum )
     << std::endl;
   os << indent << "MinDistance: "
     << static_cast< typename NumericTraits< RealType >::PrintType >(
-    m_MinDistance ) << std::endl;
+    m_HistogramDistanceMinimum ) << std::endl;
   os << indent << "MaxDistance: "
     << static_cast< typename NumericTraits< RealType >::PrintType >(
-    m_MaxDistance ) << std::endl;
+    m_HistogramDistanceMaximum ) << std::endl;
   os << indent << "InsidePixelValue: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >(
     m_InsidePixelValue ) << std::endl;

@@ -31,8 +31,8 @@ template< typename TInputImage, typename TOutputImage>
 CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
 ::CoocurrenceTextureFeaturesImageFilter() :
     m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
-    m_Min( NumericTraits<PixelType>::NonpositiveMin() ),
-    m_Max( NumericTraits<PixelType>::max() ),
+    m_HistogramMinimum( NumericTraits<PixelType>::NonpositiveMin() ),
+    m_HistogramMaximum( NumericTraits<PixelType>::max() ),
     m_InsidePixelValue( NumericTraits<PixelType>::OneValue() )
 {
   this->SetNumberOfRequiredInputs( 1 );
@@ -89,7 +89,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   input->Graft(const_cast<TInputImage *>(this->GetInput()));
 
   typedef PreProcessingFunctor PPFType;
-  PPFType ppf(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_Min, m_Max);
+  PPFType ppf(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramMinimum, m_HistogramMaximum);
 
   typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, InputImageType, PPFType> BinaryFunctorType;
   typename BinaryFunctorType::Pointer functorF = BinaryFunctorType::New();
@@ -261,20 +261,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   if ( output->GetNumberOfComponentsPerPixel() != 8 )
     {
     output->SetNumberOfComponentsPerPixel( 8 );
-    }
-}
-
-
-template<typename TInputImage, typename TOutputImage>
-void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::SetPixelValueMinMax( PixelType min, PixelType max )
-{
-  if( this->m_Min != min || this->m_Max != max )
-    {
-    this->m_Min = min;
-    this->m_Max = max;
-    this->Modified();
     }
 }
 
@@ -468,10 +454,10 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   os << indent << "NumberOfBinsPerAxis: " << m_NumberOfBinsPerAxis << std::endl;
   os << indent << "Min: "
-    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Min )
+    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_HistogramMinimum )
     << std::endl;
   os << indent << "Max: "
-    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_Max )
+    << static_cast< typename NumericTraits< PixelType >::PrintType >( m_HistogramMaximum )
     << std::endl;
   os << indent << "InsidePixelValue: "
     << static_cast< typename NumericTraits< PixelType >::PrintType >(
