@@ -246,7 +246,7 @@ protected:
     virtual void UpdateOutputInformation() ITK_OVERRIDE;
 
 private:
-  typename InputImageType::Pointer  m_DigitalizedInputImage;
+  typename InputImageType::Pointer  m_DigitizedInputImage;
   NeighborhoodRadiusType            m_NeighborhoodRadius;
   OffsetVectorPointer               m_Offsets;
   unsigned int                      m_NumberOfBinsPerAxis;

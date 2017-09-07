@@ -91,7 +91,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   typedef Digitizer<PixelType,
                       PixelType,
-                      typename DigitalisedImageType::PixelType>
+                      typename DigitizedImageType::PixelType>
     DigitizerFunctorType;
 
   DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramMinimum, m_HistogramMaximum);
@@ -113,7 +113,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   filter->SetNumberOfThreads(this->GetNumberOfThreads());
 
   filter->Update();
-  m_DigitalizedInputImage = filter->GetOutput();
+  m_DigitizedInputImage = filter->GetOutput();
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -122,7 +122,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::AfterThreadedGenerateData()
 {
   // Free internal image
-  this->m_DigitalizedInputImage = ITK_NULLPTR;
+  this->m_DigitizedInputImage = ITK_NULLPTR;
 }
 
 
@@ -145,7 +145,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( this->m_DigitalizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
@@ -175,7 +175,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   /// ***** Non-boundary Region *****
   for (; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalizedInputImage, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitizedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -449,7 +449,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   Superclass::PrintSelf( os, indent );
 
-  itkPrintSelfObjectMacro( DigitalizedInputImage );
+  itkPrintSelfObjectMacro( DigitizedInputImage );
 
   os << indent << "NeighborhoodRadius: "
     << static_cast< typename NumericTraits<
