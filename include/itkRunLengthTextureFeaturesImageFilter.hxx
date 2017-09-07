@@ -91,7 +91,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   this->m_DigitizedInputImage->CopyInformation(this->GetInput());
   this->m_DigitizedInputImage->Allocate();
   typedef itk::ImageRegionIterator< InputImageType> IteratorType;
-  IteratorType digitIt( this->m_DigitizedInputImage, this->m_DigitalizedInputImage->GetLargestPossibleRegion() );
+  IteratorType digitIt( this->m_DigitizedInputImage, this->m_DigitizedInputImage->GetLargestPossibleRegion() );
   typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
   ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
   unsigned int binNumber;
@@ -312,16 +312,19 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::UpdateOutputInformation()
+::GenerateOutputInformation()
 {
-  // Call superclass's version
-  Superclass::UpdateOutputInformation();
+  Superclass::GenerateOutputInformation();
 
-  if ( strcmp(this->GetOutput()->GetNameOfClass(), "VectorImage") == 0 )
-      {
-      typedef typename TOutputImage::AccessorFunctorType AccessorFunctorType;
-      AccessorFunctorType::SetVectorLength( this->GetOutput(), 10 );
-      }
+  OutputImageType* output = this->GetOutput();
+  // If the output image type is a VectorImage the number of
+  // components will be properly sized if before allocation, if the
+  // output is a fixed width vector and the wrong number of
+  // components, then an exception will be thrown.
+  if ( output->GetNumberOfComponentsPerPixel() != 10 )
+    {
+    output->SetNumberOfComponentsPerPixel( 10 );
+    }
 }
 
 template<typename TInputImage, typename TOutputImage>

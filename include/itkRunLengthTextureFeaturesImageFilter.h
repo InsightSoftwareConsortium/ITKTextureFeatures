@@ -243,7 +243,7 @@ protected:
   virtual void AfterThreadedGenerateData() ITK_OVERRIDE;
   virtual void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                                     ThreadIdType threadId) ITK_OVERRIDE;
-    virtual void UpdateOutputInformation() ITK_OVERRIDE;
+  virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
   typename InputImageType::Pointer  m_DigitizedInputImage;
