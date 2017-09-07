@@ -181,11 +181,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Declaration of the variables useful to iterate over the all the offsets
   OffsetType offset;
   unsigned int totalNumberOfRuns;
-  unsigned int **histogram =  new unsigned int*[m_NumberOfBinsPerAxis];
-  for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
-    {
-    histogram[axis] = new unsigned int[m_NumberOfBinsPerAxis];
-    }
+
+  vnl_matrix<unsigned int> histogram(m_NumberOfBinsPerAxis, m_NumberOfBinsPerAxis);
+
 
   // Declaration of the variables useful to iterate over the all neighborhood region
   PixelType currentInNeighborhoodPixelIntensity;
@@ -295,11 +293,6 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
       }
     }
 
-  for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
-    {
-    delete[] histogram[axis];
-    }
-  delete[] histogram;
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -365,7 +358,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::IncreaseHistogram(unsigned int **histogram, unsigned int &totalNumberOfRuns,
+::IncreaseHistogram(vnl_matrix<unsigned int> &histogram, unsigned int &totalNumberOfRuns,
                      const PixelType &currentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
@@ -387,7 +380,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeFeatures( unsigned int **histogram,const unsigned int &totalNumberOfRuns,
+::ComputeFeatures( vnl_matrix<unsigned int> &histogram, const unsigned int &totalNumberOfRuns,
                    typename TOutputImage::PixelType &outputPixel)
 {
   OutputRealType shortRunEmphasis = NumericTraits<OutputRealType>::ZeroValue();

@@ -233,10 +233,10 @@ protected:
 
   void NormalizeOffsetDirection(OffsetType &offset);
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
-  void IncreaseHistogram(unsigned int **hist, unsigned int &totalNumberOfRuns,
+  void IncreaseHistogram(vnl_matrix<unsigned int> &hist, unsigned int &totalNumberOfRuns,
                           const PixelType &currentInNeighborhoodPixelIntensity,
                           const OffsetType &offset, const unsigned int &pixelDistance);
-  void ComputeFeatures( unsigned int **hist, const unsigned int &totalNumberOfRuns,
+  void ComputeFeatures( vnl_matrix<unsigned int> &hist, const unsigned int &totalNumberOfRuns,
                        typename TOutputImage::PixelType &outputPixel);
   virtual void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
 
