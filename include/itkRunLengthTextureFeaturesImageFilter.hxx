@@ -126,6 +126,17 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   outputPtr->Allocate();
 }
 
+
+template<typename TInputImage, typename TOutputImage>
+  void
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
+::AfterThreadedGenerateData()
+{
+  // free internal image
+  this->m_DigitalizedInputImage = ITK_NULLPTR;
+}
+
+
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
