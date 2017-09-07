@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 set(module computeFeatures)
 project(${module})
 
-find_package(ITK REQUIRED COMPONENTS TextureFeatures)
+find_package(ITK REQUIRED COMPONENTS TextureFeatures ITKIOImageBase)
 include(${ITK_USE_FILE})
 
 set(${module}_SRC

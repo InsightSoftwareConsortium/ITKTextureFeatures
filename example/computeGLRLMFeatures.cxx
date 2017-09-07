@@ -43,8 +43,10 @@ int main(int argc, char * argv[])
     filter->SetInput(reader->GetOutput());
     filter->SetMaskImage(maskReader->GetOutput());
     filter->SetNumberOfBinsPerAxis(std::atoi(argv[4]));
-    filter->SetPixelValueMinMax(std::atof(argv[5]),std::atof(argv[6]));
-    filter->SetDistanceValueMinMax(std::atof(argv[7]),std::atof(argv[8]));
+    filter->SetHistogramValueMinimum(std::atof(argv[5]));
+    filter->SetHistogramValueMaximum(std::atof(argv[6]));
+    filter->SetHistogramDistanceMinimum(std::atof(argv[7]));
+    filter->SetHistogramDistanceMaximum(std::atof(argv[8]));
     neighborhood.SetRadius( std::atoi(argv[9]) );
     filter->SetNeighborhoodRadius(neighborhood.GetRadius());
 
