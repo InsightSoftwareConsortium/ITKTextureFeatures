@@ -21,6 +21,8 @@
 #include "itkRunLengthTextureFeaturesImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkNeighborhoodAlgorithm.h"
+#include "itkBinaryFunctorImageFilter.h"
+#include "itkDigitizerFunctor.h"
 
 namespace itk
 {
@@ -39,6 +41,12 @@ RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage >
 {
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfRequiredOutputs( 1 );
+
+  // Mark the "MaskImage" as an optional named input. First it has to
+  // be added to the list of named inputs then removed from the
+  // required list.
+  Self::AddRequiredInputName("MaskImage");
+  Self::RemoveRequiredInputName("MaskImage");
 
   // Set the offset directions to their defaults: half of all the possible
   // directions 1 pixel away. (The other half is included by symmetry.)
@@ -78,47 +86,49 @@ void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::BeforeThreadedGenerateData()
 {
-  typename TInputImage::Pointer maskPointer = TInputImage::New();
-  maskPointer = const_cast<TInputImage *>(this->GetMaskImage());
-  this->m_DigitalizedInputImage = InputImageType::New();
-  this->m_DigitalizedInputImage->SetRegions(this->GetInput()->GetRequestedRegion());
-  this->m_DigitalizedInputImage->CopyInformation(this->GetInput());
-  this->m_DigitalizedInputImage->Allocate();
-  typedef itk::ImageRegionIterator< InputImageType> IteratorType;
-  IteratorType digitIt( this->m_DigitalizedInputImage, this->m_DigitalizedInputImage->GetLargestPossibleRegion() );
-  typedef itk::ImageRegionConstIterator< InputImageType> ConstIteratorType;
-  ConstIteratorType inputIt( this->GetInput(), this->GetInput()->GetLargestPossibleRegion() );
-  unsigned int binNumber;
-  while( !inputIt.IsAtEnd() )
-    {
-    if( maskPointer && maskPointer->GetPixel( inputIt.GetIndex() ) != this->m_InsidePixelValue )
-      {
-      digitIt.Set(-10);
-      }
-    else if(inputIt.Get() < this->m_HistogramValueMinimum || inputIt.Get() >= this->m_HistogramValueMinimum)
-      {
-      digitIt.Set(-1);
-      }
-    else
-      {
-      binNumber = ( inputIt.Get() - m_HistogramValueMinimum)/( (m_HistogramValueMaximum - m_HistogramValueMinimum) / (float)m_NumberOfBinsPerAxis );
-      digitIt.Set(binNumber);
-      }
-    ++inputIt;
-    ++digitIt;
-    }
-  m_Spacing = this->GetInput()->GetSpacing();
 
-  // Support VectorImages by setting the number of components on the output.
-  typename TOutputImage::Pointer outputPtr = TOutputImage::New();
-  outputPtr = this->GetOutput();
-  if ( strcmp(outputPtr->GetNameOfClass(), "VectorImage") == 0 )
-      {
-      typedef typename TOutputImage::AccessorFunctorType AccessorFunctorType;
-      AccessorFunctorType::SetVectorLength( outputPtr, 10 );
-      }
-  outputPtr->Allocate();
+  typename TInputImage::Pointer input = InputImageType::New();
+  input->Graft(const_cast<TInputImage *>(this->GetInput()));
+
+  typedef Digitizer<PixelType,
+                      PixelType,
+                      typename DigitizedImageType::PixelType>
+    DigitizerFunctorType;
+
+  DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramValueMinimum, m_HistogramValueMaximum);
+
+  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, InputImageType, DigitizerFunctorType> FilterType;
+  typename FilterType::Pointer filter = FilterType::New();
+  if (this->GetMaskImage() != ITK_NULLPTR)
+    {
+    typename TInputImage::Pointer mask = MaskImageType::New();
+    mask->Graft(const_cast<TInputImage *>(this->GetMaskImage()));
+    filter->SetInput1(mask);
+    }
+  else
+    {
+    filter->SetConstant1(m_InsidePixelValue);
+    }
+  filter->SetInput2(input);
+  filter->SetFunctor(digitalizer);
+  filter->SetNumberOfThreads(this->GetNumberOfThreads());
+
+  filter->Update();
+  m_DigitizedInputImage = filter->GetOutput();
+
+  m_Spacing = this->GetInput()->GetSpacing();
 }
+
+
+template<typename TInputImage, typename TOutputImage>
+  void
+RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
+::AfterThreadedGenerateData()
+{
+  // free internal image
+  this->m_DigitizedInputImage = ITK_NULLPTR;
+}
+
 
 template<typename TInputImage, typename TOutputImage>
 void
@@ -153,14 +163,14 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
   boolRegion.SetIndex(boolStart);
   boolRegion.SetSize(boolSize);
-  alreadyVisitedImage->CopyInformation( this->m_DigitalizedInputImage );
+  alreadyVisitedImage->CopyInformation( this->m_DigitizedInputImage );
   alreadyVisitedImage->SetRegions( boolRegion );
   alreadyVisitedImage->Allocate();
 
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( this->m_DigitalizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
@@ -171,11 +181,9 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Declaration of the variables useful to iterate over the all the offsets
   OffsetType offset;
   unsigned int totalNumberOfRuns;
-  unsigned int **histogram =  new unsigned int*[m_NumberOfBinsPerAxis];
-  for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
-    {
-    histogram[axis] = new unsigned int[m_NumberOfBinsPerAxis];
-    }
+
+  vnl_matrix<unsigned int> histogram(m_NumberOfBinsPerAxis, m_NumberOfBinsPerAxis);
+
 
   // Declaration of the variables useful to iterate over the all neighborhood region
   PixelType currentInNeighborhoodPixelIntensity;
@@ -190,7 +198,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
   /// ***** Non-boundary Region *****
   for (; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalizedInputImage, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitizedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -285,47 +293,24 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
       }
     }
 
-  for(unsigned int axis = 0; axis < m_NumberOfBinsPerAxis; ++axis)
-    {
-    delete[] histogram[axis];
-    }
-  delete[] histogram;
 }
 
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::UpdateOutputInformation()
+::GenerateOutputInformation()
 {
-  // Call superclass's version
-  Superclass::UpdateOutputInformation();
+  Superclass::GenerateOutputInformation();
 
-  if ( strcmp(this->GetOutput()->GetNameOfClass(), "VectorImage") == 0 )
-      {
-      typedef typename TOutputImage::AccessorFunctorType AccessorFunctorType;
-      AccessorFunctorType::SetVectorLength( this->GetOutput(), 10 );
-      }
-}
-
-template<typename TInputImage, typename TOutputImage>
-void
-RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::SetMaskImage(const InputImageType *image )
-{
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput( 1, const_cast<InputImageType *>( image ) );
-}
-
-template<typename TInputImage, typename TOutputImage>
-const TInputImage *
-RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::GetMaskImage() const
-{
-  if( this->GetNumberOfInputs() < 2 )
+  OutputImageType* output = this->GetOutput();
+  // If the output image type is a VectorImage the number of
+  // components will be properly sized if before allocation, if the
+  // output is a fixed width vector and the wrong number of
+  // components, then an exception will be thrown.
+  if ( output->GetNumberOfComponentsPerPixel() != 10 )
     {
-    return ITK_NULLPTR;
+    output->SetNumberOfComponentsPerPixel( 10 );
     }
-  return static_cast<const InputImageType *>( this->ProcessObject::GetInput( 1 ) );
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -373,7 +358,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::IncreaseHistogram(unsigned int **histogram, unsigned int &totalNumberOfRuns,
+::IncreaseHistogram(vnl_matrix<unsigned int> &histogram, unsigned int &totalNumberOfRuns,
                      const PixelType &currentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
@@ -395,7 +380,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 template<typename TInputImage, typename TOutputImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
-::ComputeFeatures( unsigned int **histogram,const unsigned int &totalNumberOfRuns,
+::ComputeFeatures( vnl_matrix<unsigned int> &histogram, const unsigned int &totalNumberOfRuns,
                    typename TOutputImage::PixelType &outputPixel)
 {
   OutputRealType shortRunEmphasis = NumericTraits<OutputRealType>::ZeroValue();
@@ -486,7 +471,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage>
 {
   Superclass::PrintSelf( os, indent );
 
-  itkPrintSelfObjectMacro( DigitalizedInputImage );
+  itkPrintSelfObjectMacro( DigitizedInputImage );
 
   os << indent << "NeighborhoodRadius: "
     << static_cast< typename NumericTraits<

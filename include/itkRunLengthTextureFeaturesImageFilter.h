@@ -113,6 +113,8 @@ public:
 
   typedef TInputImage                     InputImageType;
   typedef TOutputImage                    OutputImageType;
+  typedef TInputImage                     MaskImageType;
+  typedef TInputImage                     DigitizedImageType;
 
   typedef typename InputImageType::PixelType    PixelType;
   typedef typename InputImageType::IndexType    IndexType;
@@ -138,10 +140,11 @@ public:
   itkGetConstMacro(NeighborhoodRadius, NeighborhoodRadiusType);
 
   /** Method to set the mask image */
-  void SetMaskImage( const InputImageType *image );
+  itkSetInputMacro(MaskImage, InputImageType);
 
   /** Method to get the mask image */
-  const InputImageType * GetMaskImage() const;
+  itkGetInputMacro(MaskImage, InputImageType);
+
 
   /** Specify the default number of bins per axis */
   itkStaticConstMacro( DefaultBinsPerAxis, unsigned int, 256 );
@@ -230,21 +233,22 @@ protected:
 
   void NormalizeOffsetDirection(OffsetType &offset);
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
-  void IncreaseHistogram(unsigned int **hist, unsigned int &totalNumberOfRuns,
+  void IncreaseHistogram(vnl_matrix<unsigned int> &hist, unsigned int &totalNumberOfRuns,
                           const PixelType &currentInNeighborhoodPixelIntensity,
                           const OffsetType &offset, const unsigned int &pixelDistance);
-  void ComputeFeatures( unsigned int **hist, const unsigned int &totalNumberOfRuns,
+  void ComputeFeatures( vnl_matrix<unsigned int> &hist, const unsigned int &totalNumberOfRuns,
                        typename TOutputImage::PixelType &outputPixel);
   virtual void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
 
   /** This method causes the filter to generate its output. */
   virtual void BeforeThreadedGenerateData() ITK_OVERRIDE;
+  virtual void AfterThreadedGenerateData() ITK_OVERRIDE;
   virtual void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                                     ThreadIdType threadId) ITK_OVERRIDE;
-    virtual void UpdateOutputInformation() ITK_OVERRIDE;
+  virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
-  typename InputImageType::Pointer  m_DigitalizedInputImage;
+  typename InputImageType::Pointer  m_DigitizedInputImage;
   NeighborhoodRadiusType            m_NeighborhoodRadius;
   OffsetVectorPointer               m_Offsets;
   unsigned int                      m_NumberOfBinsPerAxis;

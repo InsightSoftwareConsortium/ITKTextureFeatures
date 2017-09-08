@@ -22,6 +22,7 @@
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkNeighborhoodAlgorithm.h"
 #include "itkBinaryFunctorImageFilter.h"
+#include "itkDigitizerFunctor.h"
 
 namespace itk
 {
@@ -88,27 +89,31 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   typename TInputImage::Pointer input = InputImageType::New();
   input->Graft(const_cast<TInputImage *>(this->GetInput()));
 
-  typedef PreProcessingFunctor PPFType;
-  PPFType ppf(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramMinimum, m_HistogramMaximum);
+  typedef Digitizer<PixelType,
+                      PixelType,
+                      typename DigitizedImageType::PixelType>
+    DigitizerFunctorType;
 
-  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, InputImageType, PPFType> BinaryFunctorType;
-  typename BinaryFunctorType::Pointer functorF = BinaryFunctorType::New();
+  DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramMinimum, m_HistogramMaximum);
+
+  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, InputImageType, DigitizerFunctorType> FilterType;
+  typename FilterType::Pointer filter = FilterType::New();
   if (this->GetMaskImage() != ITK_NULLPTR)
     {
     typename TInputImage::Pointer mask = MaskImageType::New();
     mask->Graft(const_cast<TInputImage *>(this->GetMaskImage()));
-    functorF->SetInput1(mask);
+    filter->SetInput1(mask);
     }
   else
     {
-    functorF->SetConstant1(m_InsidePixelValue);
+    filter->SetConstant1(m_InsidePixelValue);
     }
-  functorF->SetInput2(input);
-  functorF->SetFunctor(ppf);
-  functorF->SetNumberOfThreads(this->GetNumberOfThreads());
+  filter->SetInput2(input);
+  filter->SetFunctor(digitalizer);
+  filter->SetNumberOfThreads(this->GetNumberOfThreads());
 
-  functorF->Update();
-  m_DigitalizedInputImage = functorF->GetOutput();
+  filter->Update();
+  m_DigitizedInputImage = filter->GetOutput();
 }
 
 template<typename TInputImage, typename TOutputImage>
@@ -117,7 +122,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 ::AfterThreadedGenerateData()
 {
   // Free internal image
-  this->m_DigitalizedInputImage = ITK_NULLPTR;
+  this->m_DigitizedInputImage = ITK_NULLPTR;
 }
 
 
@@ -140,7 +145,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
-  faceList = boundaryFacesCalculator( this->m_DigitalizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
+  faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
@@ -170,7 +175,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   /// ***** Non-boundary Region *****
   for (; fit != faceList.end(); ++fit )
     {
-    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitalizedInputImage, *fit );
+    NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitizedInputImage, *fit );
     typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
     IteratorType outputIt( outputPtr, *fit );
 
@@ -444,7 +449,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 
   Superclass::PrintSelf( os, indent );
 
-  itkPrintSelfObjectMacro( DigitalizedInputImage );
+  itkPrintSelfObjectMacro( DigitizedInputImage );
 
   os << indent << "NeighborhoodRadius: "
     << static_cast< typename NumericTraits<
