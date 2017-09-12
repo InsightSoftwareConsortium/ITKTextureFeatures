@@ -28,13 +28,13 @@ namespace itk
 {
 namespace Statistics
 {
-template< typename TInputImage, typename TOutputImage>
-CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
+template< typename TInputImage, typename TOutputImage, typename TMaskImage>
+CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage, TMaskImage>
 ::CoocurrenceTextureFeaturesImageFilter() :
     m_NumberOfBinsPerAxis( itkGetStaticConstMacro( DefaultBinsPerAxis ) ),
     m_HistogramMinimum( NumericTraits<PixelType>::NonpositiveMin() ),
     m_HistogramMaximum( NumericTraits<PixelType>::max() ),
-    m_InsidePixelValue( NumericTraits<PixelType>::OneValue() )
+    m_InsidePixelValue( NumericTraits<MaskPixelType>::OneValue() )
 {
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfRequiredOutputs( 1 );
@@ -70,9 +70,9 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage >
   this->m_Normalize = false;
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::SetOffset( const OffsetType offset )
 {
   OffsetVectorPointer offsetVector = OffsetVector::New();
@@ -80,9 +80,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   this->SetOffsets( offsetVector );
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::BeforeThreadedGenerateData()
 {
 
@@ -100,8 +100,8 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   typename FilterType::Pointer filter = FilterType::New();
   if (this->GetMaskImage() != ITK_NULLPTR)
     {
-    typename TInputImage::Pointer mask = MaskImageType::New();
-    mask->Graft(const_cast<TInputImage *>(this->GetMaskImage()));
+    typename TMaskImage::Pointer mask = MaskImageType::New();
+    mask->Graft(const_cast<TMaskImage *>(this->GetMaskImage()));
     filter->SetInput1(mask);
     }
   else
@@ -116,9 +116,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   m_DigitizedInputImage = filter->GetOutput();
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::AfterThreadedGenerateData()
 {
   // Free internal image
@@ -126,9 +126,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
 }
 
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
                        ThreadIdType threadId)
 {
@@ -250,9 +250,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::GenerateOutputInformation()
 {
   // Call superclass's version
@@ -269,9 +269,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
     }
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 bool
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::IsInsideNeighborhood(const OffsetType &iteratedOffset)
 {
   bool insideNeighborhood = true;
@@ -287,9 +287,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   return insideNeighborhood;
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::ComputeFeatures( const vnl_matrix<unsigned int> &hist, const unsigned int totalNumberOfFreq,
                    typename TOutputImage::PixelType &outputPixel)
 {
@@ -364,9 +364,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
     outputPixel[7] = haralickCorrelation;
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::ComputeMeansAndVariances(const vnl_matrix<unsigned int> &hist,
                            const unsigned int totalNumberOfFreq,
                            double & pixelMean,
@@ -441,9 +441,9 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
   delete[] marginalSums;
 }
 
-template<typename TInputImage, typename TOutputImage>
+template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage>
+CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
 
