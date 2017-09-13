@@ -96,7 +96,7 @@ namespace Statistics
 
 template< typename TInputImage,
           typename TOutputImage,
-          typename TMaskImage = TInputImage>
+          typename TMaskImage = Image< unsigned char, TInputImage::ImageDimension> >
 class ITK_TEMPLATE_EXPORT RunLengthTextureFeaturesImageFilter
   : public ImageToImageFilter< TInputImage, TOutputImage >
 {

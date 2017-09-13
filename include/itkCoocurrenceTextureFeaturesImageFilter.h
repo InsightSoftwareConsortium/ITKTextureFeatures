@@ -83,8 +83,9 @@ namespace Statistics
 
 template< typename TInputImage,
           typename TOutputImage,
-          typename TMaskImage = TInputImage>
-class ITK_TEMPLATE_EXPORT CoocurrenceTextureFeaturesImageFilter:public ImageToImageFilter< TInputImage, TOutputImage >
+          typename TMaskImage = Image< unsigned char, TInputImage::ImageDimension> >
+class ITK_TEMPLATE_EXPORT CoocurrenceTextureFeaturesImageFilter
+  : public ImageToImageFilter< TInputImage, TOutputImage >
 {
 public:
   /** Standard typedefs */

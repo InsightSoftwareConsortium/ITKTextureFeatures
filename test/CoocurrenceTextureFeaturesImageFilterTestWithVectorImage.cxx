@@ -62,7 +62,7 @@ int CoocurrenceTextureFeaturesImageFilterTestWithVectorImage( int argc, char *ar
 
   // Create the filter
   typedef itk::Statistics::CoocurrenceTextureFeaturesImageFilter<
-    InputImageType, OutputImageType > FilterType;
+    InputImageType, OutputImageType, InputImageType  > FilterType;
   FilterType::Pointer filter = FilterType::New();
 
   EXERCISE_BASIC_OBJECT_METHODS( filter, CoocurrenceTextureFeaturesImageFilter,
