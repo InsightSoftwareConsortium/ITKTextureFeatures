@@ -82,8 +82,10 @@ namespace Statistics
  **/
 
 template< typename TInputImage,
-          typename TOutputImage>
-class ITK_TEMPLATE_EXPORT CoocurrenceTextureFeaturesImageFilter:public ImageToImageFilter< TInputImage, TOutputImage >
+          typename TOutputImage,
+          typename TMaskImage = Image< unsigned char, TInputImage::ImageDimension> >
+class ITK_TEMPLATE_EXPORT CoocurrenceTextureFeaturesImageFilter
+  : public ImageToImageFilter< TInputImage, TOutputImage >
 {
 public:
   /** Standard typedefs */
@@ -100,7 +102,7 @@ public:
 
   typedef TInputImage                     InputImageType;
   typedef TOutputImage                    OutputImageType;
-  typedef TInputImage                     MaskImageType;
+  typedef TMaskImage                      MaskImageType;
   typedef TInputImage                     DigitizedImageType;
 
   typedef typename InputImageType::PixelType    PixelType;
@@ -128,10 +130,10 @@ public:
   itkGetConstMacro(NeighborhoodRadius, NeighborhoodRadiusType);
 
   /** Method to set the mask image */
-  itkSetInputMacro(MaskImage, InputImageType);
+  itkSetInputMacro(MaskImage, MaskImageType);
 
   /** Method to get the mask image */
-  itkGetInputMacro(MaskImage, InputImageType);
+  itkGetInputMacro(MaskImage, MaskImageType);
 
 
   /** Specify the default number of bins per axis */
@@ -182,8 +184,8 @@ public:
    * Set the pixel value of the mask that should be considered "inside" the
    * object. Defaults to 1.
    */
-  itkSetMacro( InsidePixelValue, PixelType );
-  itkGetConstMacro( InsidePixelValue, PixelType );
+  itkSetMacro( InsidePixelValue, MaskPixelType );
+  itkGetConstMacro( InsidePixelValue, MaskPixelType );
 
   /** Set the calculator to normalize the histogram (divide all bins by the
     total frequency). Normalization is off by default. */
@@ -234,7 +236,7 @@ private:
   unsigned int                      m_NumberOfBinsPerAxis;
   PixelType                         m_HistogramMinimum;
   PixelType                         m_HistogramMaximum;
-  PixelType                         m_InsidePixelValue;
+  MaskPixelType                     m_InsidePixelValue;
   bool                              m_Normalize;
 
 

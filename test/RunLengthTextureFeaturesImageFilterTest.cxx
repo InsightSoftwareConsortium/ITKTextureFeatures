@@ -67,7 +67,7 @@ int RunLengthTextureFeaturesImageFilterTest( int argc, char *argv[] )
 
   // Create the filter
   typedef itk::Statistics::RunLengthTextureFeaturesImageFilter<
-    InputImageType, OutputImageType > FilterType;
+    InputImageType, OutputImageType, InputImageType > FilterType;
 
   FilterType::Pointer filter = FilterType::New();
 
