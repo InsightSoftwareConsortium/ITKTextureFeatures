@@ -96,7 +96,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramMinimum, m_HistogramMaximum);
 
-  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, InputImageType, DigitizerFunctorType> FilterType;
+  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
   if (this->GetMaskImage() != ITK_NULLPTR)
     {
@@ -143,10 +143,10 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   typename TOutputImage::PixelType outputPixel;
 
   // Separation of the non-boundary region that will be processed in a different way
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType > boundaryFacesCalculator;
+  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType >::FaceListType
   faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
+  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType>::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
@@ -166,10 +166,10 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   vnl_matrix<unsigned int> hist(m_NumberOfBinsPerAxis, m_NumberOfBinsPerAxis);
 
   // Declaration of the variables useful to iterate over the all neighborhood region
-  PixelType currentInNeighborhoodPixelIntensity;
+  HistogramIndexType currentInNeighborhoodPixelIntensity;
 
   // Declaration of the variables useful to iterate over the run
-  PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
+  HistogramIndexType pixelIntensity( NumericTraits<HistogramIndexType>::ZeroValue() );
   OffsetType tempOffset;
 
   /// ***** Non-boundary Region *****

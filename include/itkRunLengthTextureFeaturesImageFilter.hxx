@@ -97,7 +97,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramValueMinimum, m_HistogramValueMaximum);
 
-  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, InputImageType, DigitizerFunctorType> FilterType;
+  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
   if (this->GetMaskImage() != ITK_NULLPTR)
     {
@@ -168,10 +168,10 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   alreadyVisitedImage->Allocate();
 
   // Separation of the non-boundary region that will be processed in a different way
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< TInputImage > boundaryFacesCalculator;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType > boundaryFacesCalculator;
+  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType >::FaceListType
   faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< InputImageType >::FaceListType::iterator fit = faceList.begin();
+  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType >::FaceListType::iterator fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
@@ -186,10 +186,10 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
 
   // Declaration of the variables useful to iterate over the all neighborhood region
-  PixelType currentInNeighborhoodPixelIntensity;
+  HistogramIndexType currentInNeighborhoodPixelIntensity;
 
   // Declaration of the variables useful to iterate over the run
-  PixelType pixelIntensity( NumericTraits<PixelType>::ZeroValue() );
+  HistogramIndexType pixelIntensity( NumericTraits<HistogramIndexType>::ZeroValue() );
   OffsetType iteratedOffset;
   OffsetType tempOffset;
   unsigned int pixelDistance;
@@ -263,7 +263,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
             // Special attention paid to boundaries of bins.
             // For the last bin, it is left close and right close (following the previous
             // gerrit patch). For all other bins, the bin is left close and right open.
-            if ( pixelIntensity == currentInNeighborhoodPixelIntensity )
+            if (pixelIntensity == currentInNeighborhoodPixelIntensity )
               {
                 alreadyVisitedImage->SetPixel( boolCurentInNeighborhoodIndex + iteratedOffset, true );
                 ++pixelDistance;
@@ -359,7 +359,7 @@ template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
 RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::IncreaseHistogram(vnl_matrix<unsigned int> &histogram, unsigned int &totalNumberOfRuns,
-                     const PixelType &currentInNeighborhoodPixelIntensity,
+                     const HistogramIndexType &currentInNeighborhoodPixelIntensity,
                      const OffsetType &offset, const unsigned int &pixelDistance)
 {
   float offsetDistance = 0;
@@ -428,7 +428,6 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
       shortRunHighGreyLevelEmphasis += ( frequency * i2 / j2 );
       longRunLowGreyLevelEmphasis += ( frequency * j2 / i2 );
       longRunHighGreyLevelEmphasis += ( frequency * i2 * j2 );
-
       }
     }
   greyLevelNonuniformity =
