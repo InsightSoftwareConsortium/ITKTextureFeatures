@@ -116,7 +116,6 @@ public:
   typedef TInputImage                     InputImageType;
   typedef TOutputImage                    OutputImageType;
   typedef TMaskImage                      MaskImageType;
-  typedef TInputImage                     DigitizedImageType;
 
   typedef typename InputImageType::PixelType    PixelType;
   typedef typename MaskImageType::PixelType     MaskPixelType;
@@ -131,9 +130,7 @@ public:
   typedef typename InputImageType::RegionType     InputRegionType;
   typedef typename OutputImageType::RegionType    OutputRegionType;
 
-  typedef typename itk::ConstNeighborhoodIterator< InputImageType >    NeighborhoodIteratorType;
-  typedef typename NeighborhoodIteratorType::RadiusType                NeighborhoodRadiusType;
-  typedef typename NeighborhoodIteratorType::NeighborIndexType         NeighborIndexType;
+  typedef typename itk::ConstNeighborhoodIterator< InputImageType >::RadiusType  NeighborhoodRadiusType;
 
   typedef typename NumericTraits<PixelType>::RealType                 MeasurementType;
   typedef typename NumericTraits<PixelType>::RealType                 RealType;
@@ -222,8 +219,6 @@ public:
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   // Begin concept checking
-  itkConceptMacro( InputPixelTypeCheck,
-                   ( Concept::IsInteger< typename InputImageType::PixelType>) );
   itkConceptMacro( OutputPixelTypeCheck,
                    ( Concept::IsFloatingPoint< OutputRealType > ) );
   // End concept checking
@@ -231,13 +226,18 @@ public:
 
 protected:
 
+  typedef int                                                              HistogramIndexType;
+  typedef itk::Image< HistogramIndexType, TInputImage::ImageDimension >    DigitizedImageType;
+  typedef typename itk::ConstNeighborhoodIterator< DigitizedImageType >    NeighborhoodIteratorType;
+  typedef typename NeighborhoodIteratorType::NeighborIndexType             NeighborIndexType;
+
   RunLengthTextureFeaturesImageFilter();
   virtual ~RunLengthTextureFeaturesImageFilter() {}
 
   void NormalizeOffsetDirection(OffsetType &offset);
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
   void IncreaseHistogram(vnl_matrix<unsigned int> &hist, unsigned int &totalNumberOfRuns,
-                          const PixelType &currentInNeighborhoodPixelIntensity,
+                          const HistogramIndexType &currentInNeighborhoodPixelIntensity,
                           const OffsetType &offset, const unsigned int &pixelDistance);
   void ComputeFeatures( vnl_matrix<unsigned int> &hist, const unsigned int &totalNumberOfRuns,
                        typename TOutputImage::PixelType &outputPixel);
@@ -251,16 +251,16 @@ protected:
   virtual void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
-  typename InputImageType::Pointer  m_DigitizedInputImage;
-  NeighborhoodRadiusType            m_NeighborhoodRadius;
-  OffsetVectorPointer               m_Offsets;
-  unsigned int                      m_NumberOfBinsPerAxis;
-  PixelType                         m_HistogramValueMinimum;
-  PixelType                         m_HistogramValueMaximum;
-  RealType                          m_HistogramDistanceMinimum;
-  RealType                          m_HistogramDistanceMaximum;
-  MaskPixelType                     m_InsidePixelValue;
-  typename TInputImage::SpacingType m_Spacing;
+  typename DigitizedImageType::Pointer  m_DigitizedInputImage;
+  NeighborhoodRadiusType                m_NeighborhoodRadius;
+  OffsetVectorPointer                   m_Offsets;
+  unsigned int                          m_NumberOfBinsPerAxis;
+  PixelType                             m_HistogramValueMinimum;
+  PixelType                             m_HistogramValueMaximum;
+  RealType                              m_HistogramDistanceMinimum;
+  RealType                              m_HistogramDistanceMaximum;
+  MaskPixelType                         m_InsidePixelValue;
+  typename TInputImage::SpacingType     m_Spacing;
 };
 } // end of namespace Statistics
 } // end of namespace itk

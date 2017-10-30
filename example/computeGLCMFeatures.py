@@ -6,8 +6,23 @@ if len(sys.argv) != 7:
                                     "<PixelValueMax> <NeighborhoodRadius>")
     sys.exit(1)
 
-im = itk.imread(sys.argv[1])
-mask = itk.imread(sys.argv[2])
+
+Dimension = 3
+
+#Input scan reader
+InputPixelType = itk.ctype('signed short')
+InputImageType = itk.Image[InputPixelType, Dimension]
+imReader = itk.ImageFileReader[InputImageType].New()
+imReader.SetFileName(sys.argv[1])
+
+#Input mask reader
+MaskPixelType = itk.ctype('unsigned char')
+MaskImageType = itk.Image[MaskPixelType, Dimension]
+maskReader = itk.ImageFileReader[MaskImageType].New()
+maskReader.SetFileName(sys.argv[2])
+
+im = imReader.GetOutput()
+mask = maskReader.GetOutput()
 
 filtr = itk.CoocurrenceTextureFeaturesImageFilter.New(im)
 filtr.SetMaskImage(mask)
