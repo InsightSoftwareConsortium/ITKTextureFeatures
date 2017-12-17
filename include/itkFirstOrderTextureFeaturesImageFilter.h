@@ -93,7 +93,7 @@ protected:
   {
   }
 
-  void GenerateOutputInformation() ITK_OVERRIDE
+  void GenerateOutputInformation() override
   {
     // this methods is overloaded so that if the output image is a
     // VectorImage then the correct number of components are set.
@@ -112,7 +112,7 @@ protected:
   }
 
 
-  ~FirstOrderTextureFeaturesImageFilter() ITK_OVERRIDE {}
+  ~FirstOrderTextureFeaturesImageFilter() override {}
 private:
   FirstOrderTextureFeaturesImageFilter(const Self &); //purposely not implemented
   void operator=(const Self &);                  //purposely not implemented

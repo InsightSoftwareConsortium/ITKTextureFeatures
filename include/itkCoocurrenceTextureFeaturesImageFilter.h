@@ -208,7 +208,7 @@ protected:
   typedef typename NeighborhoodIteratorType::NeighborIndexType             NeighborIndexType;
 
   CoocurrenceTextureFeaturesImageFilter();
-  ~CoocurrenceTextureFeaturesImageFilter() ITK_OVERRIDE {}
+  ~CoocurrenceTextureFeaturesImageFilter() override {}
 
   bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
   void ComputeFeatures(const vnl_matrix<unsigned int> &hist, const unsigned int totalNumberOfFreq,
@@ -219,14 +219,14 @@ protected:
                                 double & marginalMean,
                                 double & marginalDevSquared,
                                 double & pixelVariance);
-  void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
+  void PrintSelf( std::ostream & os, Indent indent ) const override;
 
   /** This method causes the filter to generate its output. */
-  void BeforeThreadedGenerateData() ITK_OVERRIDE;
-  void AfterThreadedGenerateData() ITK_OVERRIDE;
+  void BeforeThreadedGenerateData() override;
+  void AfterThreadedGenerateData() override;
   void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
-                                    ThreadIdType threadId) ITK_OVERRIDE;
-  void GenerateOutputInformation() ITK_OVERRIDE;
+                                    ThreadIdType threadId) override;
+  void GenerateOutputInformation() override;
 
 private:
   typename DigitizedImageType::Pointer  m_DigitizedInputImage;
