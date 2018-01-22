@@ -99,7 +99,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
-  if (this->GetMaskImage() != ITK_NULLPTR)
+  if (this->GetMaskImage() != nullptr)
     {
     typename TMaskImage::Pointer mask = MaskImageType::New();
     mask->Graft(const_cast<TMaskImage *>(this->GetMaskImage()));
@@ -126,7 +126,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 ::AfterThreadedGenerateData()
 {
   // free internal image
-  this->m_DigitizedInputImage = ITK_NULLPTR;
+  this->m_DigitizedInputImage = nullptr;
 }
 
 
