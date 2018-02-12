@@ -146,7 +146,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType >::FaceListType
   faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType>::FaceListType::iterator fit = faceList.begin();
+  auto fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
@@ -379,7 +379,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   // cleverly compressed to one pass, but it's not clear that that's necessary.
 
   // Initialize everything
-  double *marginalSums = new double[m_NumberOfBinsPerAxis];
+  auto *marginalSums = new double[m_NumberOfBinsPerAxis];
 
   for ( double *ms_It = marginalSums;
         ms_It < marginalSums + m_NumberOfBinsPerAxis; ms_It++ )
