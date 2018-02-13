@@ -51,8 +51,8 @@ RunLengthTextureFeaturesImageFilter< TInputImage, TOutputImage, TMaskImage>
   // Set the offset directions to their defaults: half of all the possible
   // directions 1 pixel away. (The other half is included by symmetry.)
   // We use a neighborhood iterator to calculate the appropriate offsets.
-  typedef Neighborhood<typename InputImageType::PixelType,
-    InputImageType::ImageDimension> NeighborhoodType;
+  using NeighborhoodType = Neighborhood<typename InputImageType::PixelType,
+    InputImageType::ImageDimension>;
   NeighborhoodType hood;
   hood.SetRadius( 1 );
 
@@ -90,14 +90,13 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   typename TInputImage::Pointer input = InputImageType::New();
   input->Graft(const_cast<TInputImage *>(this->GetInput()));
 
-  typedef Digitizer<PixelType,
+  using DigitizerFunctorType = Digitizer<PixelType,
                       PixelType,
-                      typename DigitizedImageType::PixelType>
-    DigitizerFunctorType;
+                      typename DigitizedImageType::PixelType>;
 
   DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramValueMinimum, m_HistogramValueMaximum);
 
-  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType> FilterType;
+  using FilterType = BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType>;
   typename FilterType::Pointer filter = FilterType::New();
   if (this->GetMaskImage() != nullptr)
     {
@@ -153,7 +152,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   typename InputRegionType::IndexType boolStart;
   typename InputRegionType::SizeType  boolSize;
   IndexType            boolCurentInNeighborhoodIndex;
-  typedef Image<bool, TInputImage::ImageDimension> BoolImageType;
+  using BoolImageType = Image<bool, TInputImage::ImageDimension>;
   typename BoolImageType::Pointer alreadyVisitedImage = BoolImageType::New();
   for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; ++i )
     {
@@ -171,7 +170,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType > boundaryFacesCalculator;
   typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType >::FaceListType
   faceList = boundaryFacesCalculator( this->m_DigitizedInputImage, outputRegionForThread, m_NeighborhoodRadius );
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType >::FaceListType::iterator fit = faceList.begin();
+  auto fit = faceList.begin();
 
   // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
@@ -199,7 +198,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   for (; fit != faceList.end(); ++fit )
     {
     NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitizedInputImage, *fit );
-    typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
+    using IteratorType = itk::ImageRegionIterator< OutputImageType>;
     IteratorType outputIt( outputPtr, *fit );
 
     // Iteration over the all image region
@@ -368,7 +367,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
     offsetDistance += (offset[i]*m_Spacing[i])*(offset[i]*m_Spacing[i]);
     }
   offsetDistance = std::sqrt(offsetDistance);
-  int offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_HistogramDistanceMinimum)/
+  auto offsetDistanceBin = static_cast< int>(( offsetDistance*pixelDistance - m_HistogramDistanceMinimum)/
           ( (m_HistogramDistanceMaximum - m_HistogramDistanceMinimum) / (float)m_NumberOfBinsPerAxis ));
   if (offsetDistanceBin < static_cast< int >( m_NumberOfBinsPerAxis ) && offsetDistanceBin >= 0)
     {
@@ -409,8 +408,8 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
         continue;
         }
 
-      double i2 = static_cast<double>( ( a + 1 ) * ( a + 1 ) );
-      double j2 = static_cast<double>( ( b + 1 ) * ( b + 1 ) );
+      auto i2 = static_cast<double>( ( a + 1 ) * ( a + 1 ) );
+      auto j2 = static_cast<double>( ( b + 1 ) * ( b + 1 ) );
 
       // Traditional measures
       shortRunEmphasis += ( frequency / j2 );

@@ -20,11 +20,11 @@ int main(int argc, char * argv[])
     }
 
     // Setup types
-    typedef itk::Image< int, 3 >                        InputImageType;
-    typedef itk::Image< itk::Vector< float, 10 > , 3 >  OutputImageType;
-    typedef itk::ImageFileReader< InputImageType >      readerType;
-    typedef itk::Neighborhood<typename InputImageType::PixelType,
-      InputImageType::ImageDimension> NeighborhoodType;
+    using InputImageType = itk::Image< int, 3 >;
+    using OutputImageType = itk::Image< itk::Vector< float, 10 > , 3 >;
+    using readerType = itk::ImageFileReader< InputImageType >;
+    using NeighborhoodType = itk::Neighborhood<typename InputImageType::PixelType,
+      InputImageType::ImageDimension>;
     NeighborhoodType neighborhood;
 
     // Create and setup a reader
@@ -36,8 +36,8 @@ int main(int argc, char * argv[])
     maskReader->SetFileName( argv[2] );
 
     // Apply the filter
-    typedef itk::Statistics::CoocurrenceTextureFeaturesImageFilter
-                                < InputImageType, OutputImageType > FilterType;
+    using FilterType = itk::Statistics::CoocurrenceTextureFeaturesImageFilter
+                                < InputImageType, OutputImageType >;
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(reader->GetOutput());
     filter->SetMaskImage(maskReader->GetOutput());
@@ -48,7 +48,7 @@ int main(int argc, char * argv[])
     filter->SetNeighborhoodRadius(neighborhood.GetRadius());
 
     // Create and setup a writter
-    typedef  itk::ImageFileWriter< OutputImageType  > WriterType;
+    using WriterType = itk::ImageFileWriter< OutputImageType  >;
     WriterType::Pointer writer = WriterType::New();
     std::string outputFilename = argv[3];
     writer->SetFileName(outputFilename.c_str());
