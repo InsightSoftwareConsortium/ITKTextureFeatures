@@ -47,16 +47,15 @@ int RunLengthTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *arg
   const unsigned int VectorComponentDimension = 10;
 
   // Declare types
-  typedef float                                       InputPixelType;
-  typedef float                                       OutputPixelComponentType;
-  typedef itk::Vector< OutputPixelComponentType, VectorComponentDimension >
-                                                      OutputPixelType;
+  using InputPixelType = float;
+  using OutputPixelComponentType = float;
+  using OutputPixelType = itk::Vector< OutputPixelComponentType, VectorComponentDimension >;
 
-  typedef itk::Image< InputPixelType, ImageDimension >  InputImageType;
-  typedef itk::Image< OutputPixelType, ImageDimension > OutputImageType;
-  typedef itk::ImageFileReader< InputImageType >        ReaderType;
-  typedef itk::Neighborhood< InputImageType::PixelType,
-    InputImageType::ImageDimension >                    NeighborhoodType;
+  using InputImageType = itk::Image< InputPixelType, ImageDimension >;
+  using OutputImageType = itk::Image< OutputPixelType, ImageDimension >;
+  using ReaderType = itk::ImageFileReader< InputImageType >;
+  using NeighborhoodType = itk::Neighborhood< InputImageType::PixelType,
+    InputImageType::ImageDimension >;
 
 
   // Create and set up a reader
@@ -68,8 +67,8 @@ int RunLengthTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *arg
   maskReader->SetFileName( argv[2] );
 
   // Create the filter
-  typedef itk::Statistics::RunLengthTextureFeaturesImageFilter<
-    InputImageType, OutputImageType, InputImageType > FilterType;
+  using FilterType = itk::Statistics::RunLengthTextureFeaturesImageFilter<
+    InputImageType, OutputImageType, InputImageType >;
   FilterType::Pointer filter = FilterType::New();
 
   filter->SetInput( reader->GetOutput() );
@@ -100,9 +99,9 @@ int RunLengthTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *arg
   TRY_EXPECT_NO_EXCEPTION( filter->Update() );
 
 
-  typedef itk::Image< OutputPixelComponentType, ImageDimension > FeatureImageType;
-  typedef itk::VectorIndexSelectionCastImageFilter<
-    OutputImageType, FeatureImageType > IndexSelectionType;
+  using FeatureImageType = itk::Image< OutputPixelComponentType, ImageDimension >;
+  using IndexSelectionType = itk::VectorIndexSelectionCastImageFilter<
+    OutputImageType, FeatureImageType >;
   IndexSelectionType::Pointer indexSelectionFilter = IndexSelectionType::New();
   indexSelectionFilter->SetInput( filter->GetOutput() );
 
@@ -111,7 +110,7 @@ int RunLengthTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *arg
     indexSelectionFilter->SetIndex(i);
 
     // Create and set up a writer
-    typedef itk::ImageFileWriter< FeatureImageType > WriterType;
+    using WriterType = itk::ImageFileWriter< FeatureImageType >;
     WriterType::Pointer writer = WriterType::New();
     std::string outputFilename = argv[3];
     std::ostringstream ss;

@@ -48,8 +48,8 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage, TMaskImage>
   // Set the offset directions to their defaults: half of all the possible
   // directions 1 pixel away. (The other half is included by symmetry.)
   // We use a neighborhood iterator to calculate the appropriate offsets.
-  typedef Neighborhood<typename InputImageType::PixelType,
-    InputImageType::ImageDimension> NeighborhoodType;
+  using NeighborhoodType = Neighborhood<typename InputImageType::PixelType,
+    InputImageType::ImageDimension>;
   NeighborhoodType hood;
   hood.SetRadius( 1 );
 
@@ -89,14 +89,13 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   typename TInputImage::Pointer input = InputImageType::New();
   input->Graft(const_cast<TInputImage *>(this->GetInput()));
 
-  typedef Digitizer<PixelType,
+  using DigitizerFunctorType = Digitizer<PixelType,
                       PixelType,
-                      typename DigitizedImageType::PixelType>
-    DigitizerFunctorType;
+                      typename DigitizedImageType::PixelType>;
 
   DigitizerFunctorType digitalizer(m_NumberOfBinsPerAxis, m_InsidePixelValue, m_HistogramMinimum, m_HistogramMaximum);
 
-  typedef BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType> FilterType;
+  using FilterType = BinaryFunctorImageFilter< MaskImageType, InputImageType, DigitizedImageType, DigitizerFunctorType>;
   typename FilterType::Pointer filter = FilterType::New();
   if (this->GetMaskImage() != nullptr)
     {
@@ -176,7 +175,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
   for (; fit != faceList.end(); ++fit )
     {
     NeighborhoodIteratorType inputNIt(m_NeighborhoodRadius, this->m_DigitizedInputImage, *fit );
-    typedef itk::ImageRegionIterator< OutputImageType> IteratorType;
+    using IteratorType = itk::ImageRegionIterator< OutputImageType>;
     IteratorType outputIt( outputPtr, *fit );
 
     // Iteration over the all image region

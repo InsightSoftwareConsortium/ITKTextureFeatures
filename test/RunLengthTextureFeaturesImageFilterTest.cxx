@@ -46,16 +46,15 @@ int RunLengthTextureFeaturesImageFilterTest( int argc, char *argv[] )
   const unsigned int VectorComponentDimension = 10;
 
   // Declare types
-  typedef float                                       InputPixelType;
-  typedef float                                       OutputPixelComponentType;
-  typedef itk::Vector< OutputPixelComponentType, VectorComponentDimension >
-                                                      OutputPixelType;
+  using InputPixelType = float;
+  using OutputPixelComponentType = float;
+  using OutputPixelType = itk::Vector< OutputPixelComponentType, VectorComponentDimension >;
 
-  typedef itk::Image< InputPixelType, ImageDimension >  InputImageType;
-  typedef itk::Image< OutputPixelType, ImageDimension > OutputImageType;
-  typedef itk::ImageFileReader< InputImageType >        ReaderType;
-  typedef itk::Neighborhood< InputImageType::PixelType,
-    InputImageType::ImageDimension >                    NeighborhoodType;
+  using InputImageType = itk::Image< InputPixelType, ImageDimension >;
+  using OutputImageType = itk::Image< OutputPixelType, ImageDimension >;
+  using ReaderType = itk::ImageFileReader< InputImageType >;
+  using NeighborhoodType = itk::Neighborhood< InputImageType::PixelType,
+    InputImageType::ImageDimension >;
 
   // Create and set up a reader
   ReaderType::Pointer reader = ReaderType::New();
@@ -66,8 +65,8 @@ int RunLengthTextureFeaturesImageFilterTest( int argc, char *argv[] )
   maskReader->SetFileName( argv[2] );
 
   // Create the filter
-  typedef itk::Statistics::RunLengthTextureFeaturesImageFilter<
-    InputImageType, OutputImageType, InputImageType > FilterType;
+  using FilterType = itk::Statistics::RunLengthTextureFeaturesImageFilter<
+    InputImageType, OutputImageType, InputImageType >;
 
   FilterType::Pointer filter = FilterType::New();
 
@@ -109,7 +108,7 @@ int RunLengthTextureFeaturesImageFilterTest( int argc, char *argv[] )
   TRY_EXPECT_NO_EXCEPTION( filter->Update() );
 
   // Create and set up a writer
-  typedef itk::ImageFileWriter< OutputImageType > WriterType;
+  using WriterType = itk::ImageFileWriter< OutputImageType >;
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( argv[3] );
   writer->SetInput( filter->GetOutput() );
