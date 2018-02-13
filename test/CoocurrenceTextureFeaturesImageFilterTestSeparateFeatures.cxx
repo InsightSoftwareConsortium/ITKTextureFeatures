@@ -41,8 +41,8 @@ int CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *a
     return EXIT_FAILURE;
     }
 
-  const unsigned int ImageDimension = 3;
-  const unsigned int VectorComponentDimension = 8;
+  constexpr unsigned int ImageDimension = 3;
+  constexpr unsigned int VectorComponentDimension = 8;
 
   // Declare types
   using InputPixelType = int;
