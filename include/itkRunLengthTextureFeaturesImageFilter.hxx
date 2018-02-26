@@ -137,8 +137,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
                        ThreadIdType threadId)
 {
   // Get the inputs/outputs
-  typename TOutputImage::Pointer outputPtr = TOutputImage::New();
-  outputPtr = this->GetOutput();
+  TOutputImage * outputPtr = this->GetOutput();
 
   ProgressReporter progress( this,
                              threadId,
