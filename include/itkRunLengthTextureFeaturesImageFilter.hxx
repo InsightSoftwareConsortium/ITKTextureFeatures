@@ -146,6 +146,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   // Creation of the output pixel type
   typename TOutputImage::PixelType outputPixel;
+  NumericTraits<typename TOutputImage::PixelType>::SetLength(outputPixel, outputPtr->GetNumberOfComponentsPerPixel());
 
   // Creation of a region with the same size as the neighborhood. This region
   // will be used to check if each voxel has already been visited.
@@ -175,7 +176,6 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
-  outputPixel = outputPtr->GetPixel(boolCurentInNeighborhoodIndex);
   typename OffsetVector::ConstIterator offsets;
 
   // Declaration of the variables useful to iterate over the all the offsets
