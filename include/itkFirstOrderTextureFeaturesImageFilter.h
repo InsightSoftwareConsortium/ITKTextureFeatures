@@ -57,6 +57,8 @@ class ITK_TEMPLATE_EXPORT FirstOrderTextureFeaturesImageFilter:
                                                                           typename TOutputImage::PixelType > >
 {
 public:
+  ITK_DISALLOW_COPY_AND_ASSIGN(FirstOrderTextureFeaturesImageFilter);
+
   /** Standard class type alias. */
   using Self = FirstOrderTextureFeaturesImageFilter;
   using Superclass = MovingHistogramImageFilter< TInputImage, TOutputImage, TKernel,
@@ -112,10 +114,7 @@ protected:
 
 
   ~FirstOrderTextureFeaturesImageFilter() override {}
-private:
-  FirstOrderTextureFeaturesImageFilter(const Self &); //purposely not implemented
-  void operator=(const Self &);                  //purposely not implemented
-};                                               // end of class
+};
 } // end namespace itk
 
 #endif
