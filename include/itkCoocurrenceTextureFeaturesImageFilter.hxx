@@ -140,6 +140,7 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   // Creation of the output pixel type
   typename TOutputImage::PixelType outputPixel;
+  NumericTraits<typename TOutputImage::PixelType>::SetLength(outputPixel, outputPtr->GetNumberOfComponentsPerPixel());
 
   // Separation of the non-boundary region that will be processed in a different way
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator< DigitizedImageType > boundaryFacesCalculator;
@@ -149,12 +150,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 
   // Declaration of the variables useful to iterate over the all image region
   bool isInImage;
-  IndexType firstIndex;
-  for ( unsigned int i = 0; i < this->m_NeighborhoodRadius.Dimension; ++i )
-    {
-    firstIndex[i] = 0;
-    }
-  outputPixel = outputPtr->GetPixel(firstIndex);
   typename OffsetVector::ConstIterator offsets;
 
   // Declaration of the variables useful to iterate over the all the offsets
