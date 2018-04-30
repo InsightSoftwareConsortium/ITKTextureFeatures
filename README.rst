@@ -4,7 +4,7 @@ ITKTextureFeatures
 .. image:: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures.svg?style=shield
     :target: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures
 
-.. image:: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures.svg?branch=master
+.. image:: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures.svg?branch=release
     :target: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures
 
 .. image:: https://img.shields.io/appveyor/ci/jbvimort/itktexturefeatures.svg
