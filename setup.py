@@ -48,6 +48,6 @@ setup(
     keywords='ITK InsightToolkit glcm texture features image imaging',
     url=r'https://itk.org/',
     install_requires=[
-        r'itk'
+        r'itk<5'
     ]
     )
