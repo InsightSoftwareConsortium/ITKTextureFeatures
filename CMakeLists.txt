@@ -1,5 +1,5 @@
 project(TextureFeatures)
-cmake_minimum_required(VERSION 3.9.5)
+cmake_minimum_required(VERSION 3.10.2)
 
 if(NOT ITK_SOURCE_DIR)
   find_package(ITK 4.10 REQUIRED)
