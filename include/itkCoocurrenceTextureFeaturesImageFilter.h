@@ -224,8 +224,7 @@ protected:
   /** This method causes the filter to generate its output. */
   void BeforeThreadedGenerateData() override;
   void AfterThreadedGenerateData() override;
-  void ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
-                                    ThreadIdType threadId) override;
+  void DynamicThreadedGenerateData( const OutputRegionType & outputRegionForThread ) override;
   void GenerateOutputInformation() override;
 
 private:
