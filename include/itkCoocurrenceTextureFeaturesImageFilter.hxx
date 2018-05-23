@@ -68,6 +68,7 @@ CoocurrenceTextureFeaturesImageFilter< TInputImage, TOutputImage, TMaskImage>
   this->m_NeighborhoodRadius = nhood.GetRadius( );
 
   this->m_Normalize = false;
+  this->DynamicMultiThreadingOn();
 }
 
 template<typename TInputImage, typename TOutputImage, typename TMaskImage>
@@ -128,15 +129,10 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
 template<typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
 CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
-::ThreadedGenerateData(const OutputRegionType & outputRegionForThread,
-                       ThreadIdType threadId)
+::DynamicThreadedGenerateData( const OutputRegionType & outputRegionForThread )
 {
   // Recuperation of the different inputs/outputs
   OutputImageType* outputPtr = this->GetOutput();
-
-  ProgressReporter progress( this,
-                             threadId,
-                             outputRegionForThread.GetNumberOfPixels() );
 
   // Creation of the output pixel type
   typename TOutputImage::PixelType outputPixel;
@@ -181,7 +177,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
         {
         outputPixel.Fill(0);
         outputIt.Set(outputPixel);
-        progress.CompletedPixel();
         ++inputNIt;
         ++outputIt;
         continue;
@@ -237,7 +232,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
       this->ComputeFeatures( hist, totalNumberOfFreq, outputPixel);
       outputIt.Set(outputPixel);
 
-      progress.CompletedPixel();
       ++inputNIt;
       ++outputIt;
       }
