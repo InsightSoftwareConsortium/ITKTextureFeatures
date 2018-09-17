@@ -111,7 +111,7 @@ RunLengthTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
     }
   filter->SetInput2(input);
   filter->SetFunctor(digitalizer);
-  filter->SetNumberOfThreads(this->GetNumberOfThreads());
+  filter->SetNumberOfWorkUnits(this->GetNumberOfWorkUnits());
 
   filter->Update();
   m_DigitizedInputImage = filter->GetOutput();
