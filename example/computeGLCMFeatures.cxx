@@ -41,10 +41,10 @@ int main(int argc, char * argv[])
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(reader->GetOutput());
     filter->SetMaskImage(maskReader->GetOutput());
-    filter->SetNumberOfBinsPerAxis(std::atoi(argv[4]));
-    filter->SetHistogramMinimum(std::atof(argv[5]));
-    filter->SetHistogramMaximum(std::atof(argv[6]));
-    neighborhood.SetRadius( std::atoi(argv[7]) );
+    filter->SetNumberOfBinsPerAxis(std::stoi(argv[4]));
+    filter->SetHistogramMinimum(std::stod(argv[5]));
+    filter->SetHistogramMaximum(std::stod(argv[6]));
+    neighborhood.SetRadius( std::stoi(argv[7]) );
     filter->SetNeighborhoodRadius(neighborhood.GetRadius());
 
     // Create and setup a writter
