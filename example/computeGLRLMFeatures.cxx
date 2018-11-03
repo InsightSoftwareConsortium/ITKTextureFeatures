@@ -42,12 +42,12 @@ int main(int argc, char * argv[])
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(reader->GetOutput());
     filter->SetMaskImage(maskReader->GetOutput());
-    filter->SetNumberOfBinsPerAxis(std::atoi(argv[4]));
-    filter->SetHistogramValueMinimum(std::atof(argv[5]));
-    filter->SetHistogramValueMaximum(std::atof(argv[6]));
-    filter->SetHistogramDistanceMinimum(std::atof(argv[7]));
-    filter->SetHistogramDistanceMaximum(std::atof(argv[8]));
-    neighborhood.SetRadius( std::atoi(argv[9]) );
+    filter->SetNumberOfBinsPerAxis(std::stoi(argv[4]));
+    filter->SetHistogramValueMinimum(std::stod(argv[5]));
+    filter->SetHistogramValueMaximum(std::stod(argv[6]));
+    filter->SetHistogramDistanceMinimum(std::stod(argv[7]));
+    filter->SetHistogramDistanceMaximum(std::stod(argv[8]));
+    neighborhood.SetRadius( std::stoi(argv[9]) );
     filter->SetNeighborhoodRadius(neighborhood.GetRadius());
 
     // Create and setup a writter
