@@ -1,14 +1,20 @@
 ITKTextureFeatures
 ==================
 
-.. image:: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures.svg?style=shield
+.. |CircleCI| image:: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures.svg?style=shield
     :target: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures
 
-.. image:: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures.svg?branch=master
+.. |TravisCI| image:: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures.svg?branch=master
     :target: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures
 
-.. image:: https://img.shields.io/appveyor/ci/jbvimort/itktexturefeatures.svg
+.. |AppVeyor| image:: https://img.shields.io/appveyor/ci/jbvimort/itktexturefeatures.svg
     :target: https://ci.appveyor.com/project/jbvimort/itktexturefeatures
+
+=========== =========== ===========
+   Linux      macOS       Windows
+=========== =========== ===========
+|CircleCI|  |TravisCI|  |AppVeyor|
+=========== =========== ===========
 
 
 Overview
