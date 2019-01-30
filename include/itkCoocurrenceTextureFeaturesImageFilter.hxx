@@ -194,10 +194,6 @@ CoocurrenceTextureFeaturesImageFilter<TInputImage, TOutputImage, TMaskImage>
           {
           // Test if the current voxel is in the mask and is the range of the image intensity specified
           currentInNeighborhoodPixelIntensity =  inputNIt.GetPixel(nb);
-          if( currentInNeighborhoodPixelIntensity < 0 )
-            {
-            continue;
-            }
 
           // Test if the current offset is still pointing to a voxel inside th neighborhood
           tempOffset = inputNIt.GetOffset(nb) + offset;
