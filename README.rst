@@ -1,21 +1,9 @@
 ITKTextureFeatures
 ==================
 
-.. |CircleCI| image:: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures.svg?style=shield
-    :target: https://circleci.com/gh/InsightSoftwareConsortium/ITKTextureFeatures
-
-.. |TravisCI| image:: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures.svg?branch=master
-    :target: https://travis-ci.org/InsightSoftwareConsortium/ITKTextureFeatures
-
-.. |AppVeyor| image:: https://img.shields.io/appveyor/ci/jbvimort/itktexturefeatures.svg
-    :target: https://ci.appveyor.com/project/jbvimort/itktexturefeatures
-
-=========== =========== ===========
-   Linux      macOS       Windows
-=========== =========== ===========
-|CircleCI|  |TravisCI|  |AppVeyor|
-=========== =========== ===========
-
+.. image:: https://dev.azure.com/InsightSoftwareConsortium/ITKModules/_apis/build/status/InsightSoftwareConsortium.ITKTextureFeatures?branchName=master
+    :target: https://dev.azure.com/InsightSoftwareConsortium/ITKModules/_build/latest?definitionId=9&branchName=master
+    :alt: Build Status
 
 Overview
 --------
