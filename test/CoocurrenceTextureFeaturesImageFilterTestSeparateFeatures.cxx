@@ -89,7 +89,7 @@ int CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *a
     filter->SetNeighborhoodRadius( hood.GetRadius() );
     }
 
-  TRY_EXPECT_NO_EXCEPTION( filter->Update() );
+  ITK_TRY_EXPECT_NO_EXCEPTION( filter->Update() );
 
 
   using FeatureImageType = itk::Image< OutputPixelComponentType, ImageDimension >;
@@ -112,7 +112,7 @@ int CoocurrenceTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *a
     writer->SetFileName( outputFilename + "_1" + s + ".nrrd" );
     writer->SetInput( indexSelectionFilter->GetOutput() );
 
-    TRY_EXPECT_NO_EXCEPTION( writer->Update() );
+    ITK_TRY_EXPECT_NO_EXCEPTION( writer->Update() );
     }
 
 
