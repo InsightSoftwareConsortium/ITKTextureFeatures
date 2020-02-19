@@ -36,83 +36,82 @@ namespace Function
  *
  * \ingroup ITKTextureFeatures
  */
-template< class TInputPixel, class TOutputPixel >
+template <class TInputPixel, class TOutputPixel>
 class ITK_TEMPLATE_EXPORT FirstOrderTextureHistogram
 {
 public:
+  FirstOrderTextureHistogram() { m_Count = 0; }
 
-  FirstOrderTextureHistogram()
-    {
-      m_Count = 0;
-    }
-
-  void AddPixel(const TInputPixel & p)
+  void
+  AddPixel(const TInputPixel & p)
   {
     m_Map[p]++;
     ++m_Count;
   }
 
-  void RemovePixel(const TInputPixel & p)
+  void
+  RemovePixel(const TInputPixel & p)
   {
 
     // insert new item if one doesn't exist
-    auto it = m_Map.find( p );
+    auto it = m_Map.find(p);
 
-    assert( it != m_Map.end() );
+    assert(it != m_Map.end());
 
-    if ( --(it->second) == 0 )
-      {
-      m_Map.erase( it );
-      }
+    if (--(it->second) == 0)
+    {
+      m_Map.erase(it);
+    }
     --m_Count;
-
   }
 
-  TOutputPixel GetValue(const TInputPixel &)
+  TOutputPixel
+  GetValue(const TInputPixel &)
   {
     TOutputPixel out;
-    NumericTraits<TOutputPixel>::SetLength( out, 8 );
+    NumericTraits<TOutputPixel>::SetLength(out, 8);
 
-    double sum = 0.0;
-    double sum2 = 0.0;
-    double sum3 = 0.0;
-    double sum4 = 0.0;
+    double       sum = 0.0;
+    double       sum2 = 0.0;
+    double       sum3 = 0.0;
+    double       sum4 = 0.0;
     const size_t count = m_Count;
 
     double entropy = 0.0;
     size_t curCount = 0;
 
-    for ( auto i = m_Map.begin(); i != m_Map.end(); ++i )
-      {
-      double t = double(i->first)*double(i->second);
+    for (auto i = m_Map.begin(); i != m_Map.end(); ++i)
+    {
+      double t = double(i->first) * double(i->second);
       sum += t;
-      sum2 += ( t *= double(i->first) );
-      sum3 += ( t *= double(i->first) );
-      sum4 += ( t *= double(i->first) );
+      sum2 += (t *= double(i->first));
+      sum3 += (t *= double(i->first));
+      sum4 += (t *= double(i->first));
 
       curCount += i->second;
 
-      const double p_x = double( i->second ) / count;
-      entropy += -p_x*std::log( p_x ) / itk::Math::ln2;
-      }
+      const double p_x = double(i->second) / count;
+      entropy += -p_x * std::log(p_x) / itk::Math::ln2;
+    }
 
     const double mean = sum / count;
 
     // unbiased estimate
-    const double variance = ( sum2 - ( sum * sum ) / count )  / ( count - 1 );
+    const double variance = (sum2 - (sum * sum) / count) / (count - 1);
     const double sigma = std::sqrt(variance);
-    double skewness = 0.0;
-    double kurtosis = 0.0;
-    if(std::abs(variance * sigma) > itk::NumericTraits<double>::min())
-      {
+    double       skewness = 0.0;
+    double       kurtosis = 0.0;
+    if (std::abs(variance * sigma) > itk::NumericTraits<double>::min())
+    {
 
-      skewness = ( ( sum3 - 3.0 * mean * sum2 ) / count + 2.0 * mean * mean*mean ) / ( variance * sigma );
-      }
-    if(std::abs(variance) > itk::NumericTraits<double>::min())
-      {
-      kurtosis = ( sum4 / count  + mean *( -4.0 * sum3 / count  +  mean * ( 6.0 *sum2 / count  - 3.0 * mean * mean ))) /
-        ( variance * variance ) - 3.0;
-      }
+      skewness = ((sum3 - 3.0 * mean * sum2) / count + 2.0 * mean * mean * mean) / (variance * sigma);
+    }
+    if (std::abs(variance) > itk::NumericTraits<double>::min())
+    {
+      kurtosis = (sum4 / count + mean * (-4.0 * sum3 / count + mean * (6.0 * sum2 / count - 3.0 * mean * mean))) /
+                   (variance * variance) -
+                 3.0;
+    }
 
     unsigned int i = 0;
     out[i++] = mean;
@@ -126,16 +125,20 @@ public:
     return out;
   }
 
-  void AddBoundary(){}
+  void
+  AddBoundary()
+  {}
 
-  void RemoveBoundary(){}
+  void
+  RemoveBoundary()
+  {}
 
 private:
-    using MapType = typename std::map< TInputPixel, size_t >;
+  using MapType = typename std::map<TInputPixel, size_t>;
 
-    MapType       m_Map;
-    size_t        m_Count;
-  };
+  MapType m_Map;
+  size_t  m_Count;
+};
 
 } // end namespace Function
 } // end namespace itk

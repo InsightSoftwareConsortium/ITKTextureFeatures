@@ -26,7 +26,7 @@ namespace itk
 namespace Statistics
 {
 
-template< typename TInput1, typename TInput2 = TInput1, typename TOutput = TInput1>
+template <typename TInput1, typename TInput2 = TInput1, typename TOutput = TInput1>
 class Digitizer
 {
 public:
@@ -34,62 +34,61 @@ public:
   using MaskPixelType = TInput1;
 
   Digitizer()
-    : m_NumberOfBinsPerAxis(256),
-      m_MaskValue(1),
-      m_Min(NumericTraits<PixelType>::min()),
-      m_Max(NumericTraits<PixelType>::max()){}
+    : m_NumberOfBinsPerAxis(256)
+    , m_MaskValue(1)
+    , m_Min(NumericTraits<PixelType>::min())
+    , m_Max(NumericTraits<PixelType>::max())
+  {}
 
-  Digitizer(unsigned int numberOfBinsPerAxis,
-                       MaskPixelType maskValue,
-                       PixelType min,
-                       PixelType max)
-    : m_NumberOfBinsPerAxis(numberOfBinsPerAxis),
-      m_MaskValue(maskValue),
-      m_Min(min),
-      m_Max(max){}
+  Digitizer(unsigned int numberOfBinsPerAxis, MaskPixelType maskValue, PixelType min, PixelType max)
+    : m_NumberOfBinsPerAxis(numberOfBinsPerAxis)
+    , m_MaskValue(maskValue)
+    , m_Min(min)
+    , m_Max(max)
+  {}
 
   ~Digitizer() {}
 
-  bool operator!=(const Digitizer& other) const
-    {
-      return (m_NumberOfBinsPerAxis != other.m_NumberOfBinsPerAxis)
-        || (m_MaskValue != other.m_MaskValue)
-        || (m_Min != other.m_Min)
-        || (m_Max != other.m_Max);
-    }
+  bool
+  operator!=(const Digitizer & other) const
+  {
+    return (m_NumberOfBinsPerAxis != other.m_NumberOfBinsPerAxis) || (m_MaskValue != other.m_MaskValue) ||
+           (m_Min != other.m_Min) || (m_Max != other.m_Max);
+  }
 
-  bool operator==(const Digitizer & other) const
-    {
-      return !( *this != other );
-    }
+  bool
+  operator==(const Digitizer & other) const
+  {
+    return !(*this != other);
+  }
 
-  inline TOutput operator()(const MaskPixelType & maskPixel,
-                                     const PixelType & inputPixel) const
-    {
+  inline TOutput
+  operator()(const MaskPixelType & maskPixel, const PixelType & inputPixel) const
+  {
 
-      if(maskPixel != m_MaskValue)
-        {
-        return - 10;
-        }
-      else if (inputPixel < this->m_Min || inputPixel >= m_Max)
-        {
-        return - 1;
-        }
-      else
-        {
-        return Math::Floor< TOutput >((inputPixel - m_Min)/((m_Max-m_Min)/ (float)m_NumberOfBinsPerAxis));
-        }
+    if (maskPixel != m_MaskValue)
+    {
+      return -10;
     }
+    else if (inputPixel < this->m_Min || inputPixel >= m_Max)
+    {
+      return -1;
+    }
+    else
+    {
+      return Math::Floor<TOutput>((inputPixel - m_Min) / ((m_Max - m_Min) / (float)m_NumberOfBinsPerAxis));
+    }
+  }
 
   unsigned int m_NumberOfBinsPerAxis;
 
-  MaskPixelType m_MaskValue; 
+  MaskPixelType m_MaskValue;
 
   typename NumericTraits<PixelType>::RealType m_Min;
   typename NumericTraits<PixelType>::RealType m_Max;
 };
 
-}
-}
+} // namespace Statistics
+} // namespace itk
 
 #endif

@@ -25,23 +25,23 @@
 #include "itkVectorIndexSelectionCastImageFilter.h"
 #include "itkTestingMacros.h"
 
-int RunLengthTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *argv[] )
+int
+RunLengthTextureFeaturesImageFilterTestSeparateFeatures(int argc, char * argv[])
 {
-  if( argc < 4 )
-    {
+  if (argc < 4)
+  {
     std::cerr << "Missing parameters." << std::endl;
-    std::cerr << "Usage: " << argv[0]
-      << " inputImageFile"
-      << " maskImageFile"
-      << " outputImageFile"
-      << " [numberOfBinsPerAxis]"
-      << " [pixelValueMin]"
-      << " [pixelValueMax]"
-      << " [minDistance]"
-      << " [maxDistance]"
-      << " [neighborhoodRadius]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " inputImageFile"
+              << " maskImageFile"
+              << " outputImageFile"
+              << " [numberOfBinsPerAxis]"
+              << " [pixelValueMin]"
+              << " [pixelValueMax]"
+              << " [minDistance]"
+              << " [maxDistance]"
+              << " [neighborhoodRadius]" << std::endl;
     return EXIT_FAILURE;
-    }
+  }
 
   constexpr unsigned int ImageDimension = 3;
   constexpr unsigned int VectorComponentDimension = 10;
@@ -49,78 +49,76 @@ int RunLengthTextureFeaturesImageFilterTestSeparateFeatures( int argc, char *arg
   // Declare types
   using InputPixelType = float;
   using OutputPixelComponentType = float;
-  using OutputPixelType = itk::Vector< OutputPixelComponentType, VectorComponentDimension >;
+  using OutputPixelType = itk::Vector<OutputPixelComponentType, VectorComponentDimension>;
 
-  using InputImageType = itk::Image< InputPixelType, ImageDimension >;
-  using OutputImageType = itk::Image< OutputPixelType, ImageDimension >;
-  using ReaderType = itk::ImageFileReader< InputImageType >;
-  using NeighborhoodType = itk::Neighborhood< InputImageType::PixelType,
-    InputImageType::ImageDimension >;
+  using InputImageType = itk::Image<InputPixelType, ImageDimension>;
+  using OutputImageType = itk::Image<OutputPixelType, ImageDimension>;
+  using ReaderType = itk::ImageFileReader<InputImageType>;
+  using NeighborhoodType = itk::Neighborhood<InputImageType::PixelType, InputImageType::ImageDimension>;
 
 
   // Create and set up a reader
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileName( argv[1] );
+  reader->SetFileName(argv[1]);
 
   // Create and set up a maskReader
   ReaderType::Pointer maskReader = ReaderType::New();
-  maskReader->SetFileName( argv[2] );
+  maskReader->SetFileName(argv[2]);
 
   // Create the filter
-  using FilterType = itk::Statistics::RunLengthTextureFeaturesImageFilter<
-    InputImageType, OutputImageType, InputImageType >;
+  using FilterType =
+    itk::Statistics::RunLengthTextureFeaturesImageFilter<InputImageType, OutputImageType, InputImageType>;
   FilterType::Pointer filter = FilterType::New();
 
-  filter->SetInput( reader->GetOutput() );
-  filter->SetMaskImage( maskReader->GetOutput() );
+  filter->SetInput(reader->GetOutput());
+  filter->SetMaskImage(maskReader->GetOutput());
 
-  if( argc >= 5 )
-    {
-    unsigned int numberOfBinsPerAxis = std::stoi( argv[4] );
-    filter->SetNumberOfBinsPerAxis( numberOfBinsPerAxis );
+  if (argc >= 5)
+  {
+    unsigned int numberOfBinsPerAxis = std::stoi(argv[4]);
+    filter->SetNumberOfBinsPerAxis(numberOfBinsPerAxis);
 
-    FilterType::PixelType pixelValueMin = std::stod( argv[5] );
-    FilterType::PixelType pixelValueMax = std::stod( argv[6] );
-    filter->SetHistogramValueMinimum( pixelValueMin );
-    filter->SetHistogramValueMaximum( pixelValueMax );
+    FilterType::PixelType pixelValueMin = std::stod(argv[5]);
+    FilterType::PixelType pixelValueMax = std::stod(argv[6]);
+    filter->SetHistogramValueMinimum(pixelValueMin);
+    filter->SetHistogramValueMaximum(pixelValueMax);
 
-    FilterType::RealType minDistance = std::stod( argv[7] );
-    FilterType::RealType maxDistance = std::stod( argv[8] );
-    filter->SetHistogramDistanceMinimum( minDistance );
-    filter->SetHistogramDistanceMaximum( maxDistance );
-
-
-    NeighborhoodType::SizeValueType neighborhoodRadius = std::stoi( argv[9] );
-    NeighborhoodType hood;
-    hood.SetRadius( neighborhoodRadius );
-    filter->SetNeighborhoodRadius( hood.GetRadius() );
-    }
-
-  ITK_TRY_EXPECT_NO_EXCEPTION( filter->Update() );
+    FilterType::RealType minDistance = std::stod(argv[7]);
+    FilterType::RealType maxDistance = std::stod(argv[8]);
+    filter->SetHistogramDistanceMinimum(minDistance);
+    filter->SetHistogramDistanceMaximum(maxDistance);
 
 
-  using FeatureImageType = itk::Image< OutputPixelComponentType, ImageDimension >;
-  using IndexSelectionType = itk::VectorIndexSelectionCastImageFilter<
-    OutputImageType, FeatureImageType >;
+    NeighborhoodType::SizeValueType neighborhoodRadius = std::stoi(argv[9]);
+    NeighborhoodType                hood;
+    hood.SetRadius(neighborhoodRadius);
+    filter->SetNeighborhoodRadius(hood.GetRadius());
+  }
+
+  ITK_TRY_EXPECT_NO_EXCEPTION(filter->Update());
+
+
+  using FeatureImageType = itk::Image<OutputPixelComponentType, ImageDimension>;
+  using IndexSelectionType = itk::VectorIndexSelectionCastImageFilter<OutputImageType, FeatureImageType>;
   IndexSelectionType::Pointer indexSelectionFilter = IndexSelectionType::New();
-  indexSelectionFilter->SetInput( filter->GetOutput() );
+  indexSelectionFilter->SetInput(filter->GetOutput());
 
-  for( unsigned int i = 0; i < VectorComponentDimension; i++ )
-    {
+  for (unsigned int i = 0; i < VectorComponentDimension; i++)
+  {
     indexSelectionFilter->SetIndex(i);
 
     // Create and set up a writer
-    using WriterType = itk::ImageFileWriter< FeatureImageType >;
+    using WriterType = itk::ImageFileWriter<FeatureImageType>;
     WriterType::Pointer writer = WriterType::New();
-    std::string outputFilename = argv[3];
-    std::ostringstream ss;
+    std::string         outputFilename = argv[3];
+    std::ostringstream  ss;
     ss << i;
     std::string s = ss.str();
-    writer->SetFileName( outputFilename + "_" + s + ".nrrd" );
-    writer->SetInput( indexSelectionFilter->GetOutput() );
+    writer->SetFileName(outputFilename + "_" + s + ".nrrd");
+    writer->SetInput(indexSelectionFilter->GetOutput());
 
-    ITK_TRY_EXPECT_NO_EXCEPTION( writer->Update() );
-    }
+    ITK_TRY_EXPECT_NO_EXCEPTION(writer->Update());
+  }
 
 
   std::cout << "Test finished." << std::endl;
