@@ -22,80 +22,82 @@
 #include "itkImageFileWriter.h"
 
 
-static void Test1( const std::string &inFileName, const std::string &outFileName )
+static void
+Test1(const std::string & inFileName, const std::string & outFileName)
 {
   constexpr unsigned int ImageDimension = 3;
-  using ImageType = itk::Image<unsigned char, ImageDimension >;
-  using OImageType = itk::Image<itk::FixedArray<float,8>, ImageDimension >;
-  using KernelType = itk::FlatStructuringElement< ImageDimension >;
+  using ImageType = itk::Image<unsigned char, ImageDimension>;
+  using OImageType = itk::Image<itk::FixedArray<float, 8>, ImageDimension>;
+  using KernelType = itk::FlatStructuringElement<ImageDimension>;
 
-  using TextureFilterType = itk::FirstOrderTextureFeaturesImageFilter< ImageType, OImageType, KernelType >;
+  using TextureFilterType = itk::FirstOrderTextureFeaturesImageFilter<ImageType, OImageType, KernelType>;
 
 
   using ReaderType = itk::ImageFileReader<ImageType>;
 
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileName( inFileName );
+  reader->SetFileName(inFileName);
   reader->UpdateLargestPossibleRegion();
 
   KernelType::SizeType radius;
-  radius.Fill( 5 );
-  KernelType kernel = KernelType::Box( radius );
+  radius.Fill(5);
+  KernelType                 kernel = KernelType::Box(radius);
   TextureFilterType::Pointer filter = TextureFilterType::New();
-  filter->SetKernel( kernel );
-  filter->SetInput( reader->GetOutput() );
+  filter->SetKernel(kernel);
+  filter->SetInput(reader->GetOutput());
   filter->UpdateLargestPossibleRegion();
 
   using WriterType = itk::ImageFileWriter<OImageType>;
 
   WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName( outFileName );
+  writer->SetFileName(outFileName);
   writer->SetInput(filter->GetOutput());
   writer->Update();
 }
 
 
-static void Test2( std::string inFileName )
+static void
+Test2(std::string inFileName)
 {
   constexpr unsigned int ImageDimension = 3;
-  using ImageType = itk::Image<unsigned char, ImageDimension >;
-  using OImageType = itk::VectorImage<float, ImageDimension >;
-  using KernelType = itk::FlatStructuringElement< ImageDimension >;
+  using ImageType = itk::Image<unsigned char, ImageDimension>;
+  using OImageType = itk::VectorImage<float, ImageDimension>;
+  using KernelType = itk::FlatStructuringElement<ImageDimension>;
 
-  using TextureFilterType = itk::FirstOrderTextureFeaturesImageFilter< ImageType, OImageType, KernelType >;
+  using TextureFilterType = itk::FirstOrderTextureFeaturesImageFilter<ImageType, OImageType, KernelType>;
 
 
   using ReaderType = itk::ImageFileReader<ImageType>;
 
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileName( inFileName );
+  reader->SetFileName(inFileName);
   reader->UpdateLargestPossibleRegion();
 
   KernelType::SizeType radius;
-  radius.Fill( 5 );
-  KernelType kernel = KernelType::Box( radius );
+  radius.Fill(5);
+  KernelType                 kernel = KernelType::Box(radius);
   TextureFilterType::Pointer filter = TextureFilterType::New();
-  filter->SetKernel( kernel );
-  filter->SetInput( reader->GetOutput() );
+  filter->SetKernel(kernel);
+  filter->SetInput(reader->GetOutput());
   filter->UpdateLargestPossibleRegion();
 
   std::cout << "filter..." << std::endl;
-
 }
 
-int itkFirstOrderTextureFeaturesImageFilterTest( int argc, char *argv[] )
+int
+itkFirstOrderTextureFeaturesImageFilterTest(int argc, char * argv[])
 {
 
-  if ( argc < 2 )
-    {
+  if (argc < 2)
+  {
     std::cerr << "Usage: " << std::endl;
     std::cerr << argv[0] << "  inputImageFile outputImageFile" << std::endl;
     return EXIT_FAILURE;
-    }
+  }
 
 
-  Test1( argv[1], argv[2] );
-  Test2( argv[1] );
+  Test1(argv[1], argv[2]);
+  Test2(argv[1]);
 
   return EXIT_SUCCESS;
 }

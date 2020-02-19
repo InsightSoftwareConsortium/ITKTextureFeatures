@@ -45,7 +45,8 @@ namespace Statistics
  *
  * Template Parameters:
  * -# The input image type: a N dimensional image where the pixel type MUST be integer.
- * -# The output image type: a N dimensional image where the pixel type MUST be a vector of floating points or a VectorImage.
+ * -# The output image type: a N dimensional image where the pixel type MUST be a vector of floating points or a
+ *VectorImage.
  *
  * Inputs and parameters:
  * -# An image
@@ -88,18 +89,17 @@ namespace Statistics
  * \ingroup TextureFeatures
  **/
 
-template< typename TInputImage,
+template <typename TInputImage,
           typename TOutputImage,
-          typename TMaskImage = Image< unsigned char, TInputImage::ImageDimension> >
-class ITK_TEMPLATE_EXPORT CoocurrenceTextureFeaturesImageFilter
-  : public ImageToImageFilter< TInputImage, TOutputImage >
+          typename TMaskImage = Image<unsigned char, TInputImage::ImageDimension>>
+class ITK_TEMPLATE_EXPORT CoocurrenceTextureFeaturesImageFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
 public:
   /** Standard type alias */
   using Self = CoocurrenceTextureFeaturesImageFilter;
-  using Superclass = ImageToImageFilter< TInputImage, TOutputImage >;
-  using Pointer = SmartPointer< Self >;
-  using ConstPointer = SmartPointer< const Self >;
+  using Superclass = ImageToImageFilter<TInputImage, TOutputImage>;
+  using Pointer = SmartPointer<Self>;
+  using ConstPointer = SmartPointer<const Self>;
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(CoocurrenceTextureFeaturesImageFilter, ImageToImageFilter);
@@ -117,14 +117,14 @@ public:
   using PointType = typename InputImageType::PointType;
 
   using OffsetType = typename InputImageType::OffsetType;
-  using OffsetVector = VectorContainer< unsigned char, OffsetType >;
+  using OffsetVector = VectorContainer<unsigned char, OffsetType>;
   using OffsetVectorPointer = typename OffsetVector::Pointer;
   using OffsetVectorConstPointer = typename OffsetVector::ConstPointer;
 
   using InputRegionType = typename InputImageType::RegionType;
   using OutputRegionType = typename OutputImageType::RegionType;
 
-  using NeighborhoodRadiusType = typename itk::ConstNeighborhoodIterator< InputImageType >::RadiusType;
+  using NeighborhoodRadiusType = typename itk::ConstNeighborhoodIterator<InputImageType>::RadiusType;
 
   using MeasurementType = typename NumericTraits<PixelType>::RealType;
   using RealType = typename NumericTraits<PixelType>::RealType;
@@ -152,7 +152,7 @@ public:
    * of (-1, 0). This is required from the iterating order of pixel iterator.
    *
    */
-  itkSetObjectMacro( Offsets, OffsetVector );
+  itkSetObjectMacro(Offsets, OffsetVector);
 
   /**
    * Set offset over which the intensities pairs will be computed.
@@ -163,33 +163,34 @@ public:
    * of (-1, 0). This is required from the iterating order of pixel iterator.
    *
    */
-  void SetOffset( const OffsetType offset );
+  void
+  SetOffset(const OffsetType offset);
 
   /**
    * Get the current offset(s).
    */
-  itkGetModifiableObjectMacro(Offsets, OffsetVector );
+  itkGetModifiableObjectMacro(Offsets, OffsetVector);
 
   /** Set number of histogram bins along each axis */
-  itkSetMacro( NumberOfBinsPerAxis, unsigned int );
+  itkSetMacro(NumberOfBinsPerAxis, unsigned int);
 
   /** Get number of histogram bins along each axis */
-  itkGetConstMacro( NumberOfBinsPerAxis, unsigned int );
+  itkGetConstMacro(NumberOfBinsPerAxis, unsigned int);
 
   /** Get the max pixel value defining one dimension of the joint histogram. */
-  itkGetConstMacro( HistogramMaximum, PixelType );
-  itkSetMacro( HistogramMaximum, PixelType);
+  itkGetConstMacro(HistogramMaximum, PixelType);
+  itkSetMacro(HistogramMaximum, PixelType);
 
   /** Get the min pixel value defining one dimension of the joint histogram. */
-  itkGetConstMacro( HistogramMinimum, PixelType );
-  itkSetMacro( HistogramMinimum, PixelType);
+  itkGetConstMacro(HistogramMinimum, PixelType);
+  itkSetMacro(HistogramMinimum, PixelType);
 
   /**
    * Set the pixel value of the mask that should be considered "inside" the
    * object. Defaults to 1.
    */
-  itkSetMacro( InsidePixelValue, MaskPixelType );
-  itkGetConstMacro( InsidePixelValue, MaskPixelType );
+  itkSetMacro(InsidePixelValue, MaskPixelType);
+  itkGetConstMacro(InsidePixelValue, MaskPixelType);
 
   /** Set the calculator to normalize the histogram (divide all bins by the
     total frequency). Normalization is off by default. */
@@ -198,60 +199,65 @@ public:
   itkBooleanMacro(Normalize);
 
   using OutputPixelType = typename OutputImageType::PixelType;
-  using OutputRealType = typename NumericTraits< OutputPixelType >::ScalarRealType;
+  using OutputRealType = typename NumericTraits<OutputPixelType>::ScalarRealType;
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   // Begin concept checking
-  itkConceptMacro( OutputPixelTypeCheck,
-                   ( Concept::IsFloatingPoint< OutputRealType > ) );
+  itkConceptMacro(OutputPixelTypeCheck, (Concept::IsFloatingPoint<OutputRealType>));
   // End concept checking
 #endif
 
 protected:
-
   using HistogramIndexType = int;
-  using DigitizedImageType = itk::Image< HistogramIndexType, TInputImage::ImageDimension >;
-  using NeighborhoodIteratorType = typename itk::ConstNeighborhoodIterator< DigitizedImageType >;
+  using DigitizedImageType = itk::Image<HistogramIndexType, TInputImage::ImageDimension>;
+  using NeighborhoodIteratorType = typename itk::ConstNeighborhoodIterator<DigitizedImageType>;
   using NeighborIndexType = typename NeighborhoodIteratorType::NeighborIndexType;
 
   CoocurrenceTextureFeaturesImageFilter();
   ~CoocurrenceTextureFeaturesImageFilter() override {}
 
-  bool IsInsideNeighborhood(const OffsetType &iteratedOffset);
-  void ComputeFeatures(const vnl_matrix<unsigned int> &hist, const unsigned int totalNumberOfFreq,
-                       typename TOutputImage::PixelType &outputPixel);
-  void ComputeMeansAndVariances(const vnl_matrix<unsigned int> &hist,
-                                const unsigned int totalNumberOfFreq,
-                                double & pixelMean,
-                                double & marginalMean,
-                                double & marginalDevSquared,
-                                double & pixelVariance);
-  void PrintSelf( std::ostream & os, Indent indent ) const override;
+  bool
+  IsInsideNeighborhood(const OffsetType & iteratedOffset);
+  void
+  ComputeFeatures(const vnl_matrix<unsigned int> &   hist,
+                  const unsigned int                 totalNumberOfFreq,
+                  typename TOutputImage::PixelType & outputPixel);
+  void
+  ComputeMeansAndVariances(const vnl_matrix<unsigned int> & hist,
+                           const unsigned int               totalNumberOfFreq,
+                           double &                         pixelMean,
+                           double &                         marginalMean,
+                           double &                         marginalDevSquared,
+                           double &                         pixelVariance);
+  void
+  PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** This method causes the filter to generate its output. */
-  void BeforeThreadedGenerateData() override;
-  void AfterThreadedGenerateData() override;
-  void DynamicThreadedGenerateData( const OutputRegionType & outputRegionForThread ) override;
-  void GenerateOutputInformation() override;
+  void
+  BeforeThreadedGenerateData() override;
+  void
+  AfterThreadedGenerateData() override;
+  void
+  DynamicThreadedGenerateData(const OutputRegionType & outputRegionForThread) override;
+  void
+  GenerateOutputInformation() override;
 
 private:
-  typename DigitizedImageType::Pointer  m_DigitizedInputImage;
+  typename DigitizedImageType::Pointer m_DigitizedInputImage;
 
-  NeighborhoodRadiusType            m_NeighborhoodRadius;
-  OffsetVectorPointer               m_Offsets;
-  unsigned int                      m_NumberOfBinsPerAxis;
-  PixelType                         m_HistogramMinimum;
-  PixelType                         m_HistogramMaximum;
-  MaskPixelType                     m_InsidePixelValue;
-  bool                              m_Normalize;
-
-
+  NeighborhoodRadiusType m_NeighborhoodRadius;
+  OffsetVectorPointer    m_Offsets;
+  unsigned int           m_NumberOfBinsPerAxis;
+  PixelType              m_HistogramMinimum;
+  PixelType              m_HistogramMaximum;
+  MaskPixelType          m_InsidePixelValue;
+  bool                   m_Normalize;
 };
 } // end of namespace Statistics
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkCoocurrenceTextureFeaturesImageFilter.hxx"
+#  include "itkCoocurrenceTextureFeaturesImageFilter.hxx"
 #endif
 
 #endif

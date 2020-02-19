@@ -48,30 +48,32 @@ namespace itk
  * \ingroup ITKTextureFeatures
  */
 
-template< class TInputImage, class TOutputImage, class TKernel >
-class ITK_TEMPLATE_EXPORT FirstOrderTextureFeaturesImageFilter:
-  public MovingHistogramImageFilter< TInputImage,
-                                     TOutputImage,
-                                     TKernel,
-                                     typename Function::FirstOrderTextureHistogram< typename TInputImage::PixelType,
-                                                                          typename TOutputImage::PixelType > >
+template <class TInputImage, class TOutputImage, class TKernel>
+class ITK_TEMPLATE_EXPORT FirstOrderTextureFeaturesImageFilter
+  : public MovingHistogramImageFilter<
+      TInputImage,
+      TOutputImage,
+      TKernel,
+      typename Function::FirstOrderTextureHistogram<typename TInputImage::PixelType, typename TOutputImage::PixelType>>
 {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(FirstOrderTextureFeaturesImageFilter);
 
   /** Standard class type alias. */
   using Self = FirstOrderTextureFeaturesImageFilter;
-  using Superclass = MovingHistogramImageFilter< TInputImage, TOutputImage, TKernel,
-    typename Function::FirstOrderTextureHistogram< typename TInputImage::PixelType,  typename TOutputImage::PixelType> >;
-  using Pointer = SmartPointer< Self >;
-  using ConstPointer = SmartPointer< const Self >;
+  using Superclass = MovingHistogramImageFilter<
+    TInputImage,
+    TOutputImage,
+    TKernel,
+    typename Function::FirstOrderTextureHistogram<typename TInputImage::PixelType, typename TOutputImage::PixelType>>;
+  using Pointer = SmartPointer<Self>;
+  using ConstPointer = SmartPointer<const Self>;
 
   /** Standard New method. */
   itkNewMacro(Self);
 
   /** Runtime information support. */
-  itkTypeMacro(FirstOrderTextureFeaturesImageFilter,
-               MovingHistogramMorphologyImageFilter);
+  itkTypeMacro(FirstOrderTextureFeaturesImageFilter, MovingHistogramMorphologyImageFilter);
 
   /** Image related type alias. */
   using InputImageType = TInputImage;
@@ -86,30 +88,33 @@ public:
 
   /** Image related type alias. */
   static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
+
 protected:
-
-  unsigned int GetNumberOfOutputComponents() { return 8;}
-
-  FirstOrderTextureFeaturesImageFilter()
+  unsigned int
+  GetNumberOfOutputComponents()
   {
+    return 8;
   }
 
-  void GenerateOutputInformation() override
+  FirstOrderTextureFeaturesImageFilter() {}
+
+  void
+  GenerateOutputInformation() override
   {
     // this methods is overloaded so that if the output image is a
     // VectorImage then the correct number of components are set.
 
     Superclass::GenerateOutputInformation();
-    OutputImageType* output = this->GetOutput();
+    OutputImageType * output = this->GetOutput();
 
-    if ( !output )
-      {
+    if (!output)
+    {
       return;
-      }
-    if ( output->GetNumberOfComponentsPerPixel() != this->GetNumberOfOutputComponents() )
-      {
-      output->SetNumberOfComponentsPerPixel( this->GetNumberOfOutputComponents() );
-      }
+    }
+    if (output->GetNumberOfComponentsPerPixel() != this->GetNumberOfOutputComponents())
+    {
+      output->SetNumberOfComponentsPerPixel(this->GetNumberOfOutputComponents());
+    }
   }
 
 
