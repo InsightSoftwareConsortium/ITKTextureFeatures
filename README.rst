@@ -4,10 +4,6 @@ ITKTextureFeatures
 .. image:: https://github.com/InsightSoftwareConsortium/ITKTextureFeatures/workflows/Build,%20test,%20package/badge.svg
     :alt:    Build Status
 
-.. image:: https://dev.azure.com/InsightSoftwareConsortium/ITKModules/_apis/build/status/InsightSoftwareConsortium.ITKTextureFeatures?branchName=master
-    :target: https://dev.azure.com/InsightSoftwareConsortium/ITKModules/_build/latest?definitionId=9&branchName=master
-    :alt: Build Status
-
 Overview
 --------
 
