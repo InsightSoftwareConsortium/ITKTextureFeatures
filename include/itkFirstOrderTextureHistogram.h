@@ -101,12 +101,12 @@ public:
     const double sigma = std::sqrt(variance);
     double       skewness = 0.0;
     double       kurtosis = 0.0;
-    if (std::abs(variance * sigma) > itk::NumericTraits<double>::min())
+    if (itk::Math::abs(variance * sigma) > itk::NumericTraits<double>::min())
     {
 
       skewness = ((sum3 - 3.0 * mean * sum2) / count + 2.0 * mean * mean * mean) / (variance * sigma);
     }
-    if (std::abs(variance) > itk::NumericTraits<double>::min())
+    if (itk::Math::abs(variance) > itk::NumericTraits<double>::min())
     {
       kurtosis = (sum4 / count + mean * (-4.0 * sum3 / count + mean * (6.0 * sum2 / count - 3.0 * mean * mean))) /
                    (variance * variance) -
