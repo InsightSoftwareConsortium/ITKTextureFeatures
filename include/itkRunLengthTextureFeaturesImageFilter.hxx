@@ -18,7 +18,6 @@
 #ifndef itkRunLengthTextureFeaturesImageFilter_hxx
 #define itkRunLengthTextureFeaturesImageFilter_hxx
 
-#include "itkRunLengthTextureFeaturesImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkNeighborhoodAlgorithm.h"
 #include "itkBinaryFunctorImageFilter.h"

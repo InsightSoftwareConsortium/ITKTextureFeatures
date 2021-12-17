@@ -18,7 +18,6 @@
 #ifndef itkCoocurrenceTextureFeaturesImageFilter_hxx
 #define itkCoocurrenceTextureFeaturesImageFilter_hxx
 
-#include "itkCoocurrenceTextureFeaturesImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkNeighborhoodAlgorithm.h"
 #include "itkBinaryFunctorImageFilter.h"
