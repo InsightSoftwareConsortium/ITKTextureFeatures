@@ -10,14 +10,14 @@ Overview
 This repository contains `ITK <https://itk.org>`_ filters to estimate
 texture feature maps from N-dimensional images.
 
-For more information, see the `Insight Journal article <http://hdl.handle.net/10380/3574>`_::
+For more information, see the `Insight Journal article <https://hdl.handle.net/10380/3574>`_::
 
   Vimort J., McCormick M., Budin F., Paniagua B.
   Computing Textural Feature Maps for N-Dimensional images
   McCormick M.
   The Insight Journal. January-December. 2017.
-  http://hdl.handle.net/10380/3574
-  http://insight-journal.org/browse/publication/985
+  https://hdl.handle.net/10380/3574
+  https://insight-journal.org/browse/publication/985
 
 Installation
 ------------
