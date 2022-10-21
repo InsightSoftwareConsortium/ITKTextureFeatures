@@ -12,7 +12,7 @@ except ImportError:
 
 setup(
     name='itk-texturefeatures',
-    version='3.5.1',
+    version='3.5.2',
     author='Insight Software Consortium',
     author_email='community@itk.org',
     packages=['itk'],
@@ -48,6 +48,6 @@ setup(
     keywords='ITK InsightToolkit glcm texture features image imaging',
     url=r'https://itk.org/',
     install_requires=[
-        r'itk>=5.2.0.post3'
+        r'itk>=5.3rc04.post3'
     ]
     )
