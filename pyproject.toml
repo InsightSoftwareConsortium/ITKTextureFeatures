@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "itk-texturefeatures"
-version = "4.0.0"
+version = "4.0.1"
 description = "An ITK module to compute N-dimension grayscale texture feature images"
 readme = "README.rst"
 license = {file = "LICENSE"}
@@ -39,7 +39,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
     "Topic :: Software Development :: Libraries",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "itk == 5.4.*",
 ]
